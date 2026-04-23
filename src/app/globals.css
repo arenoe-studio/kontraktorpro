@@ -1,26 +1,219 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f9fafb;
+  --foreground: #111827;
+  --color-primary-900: #0f2338;
+  --color-primary-800: #1b3a5c;
+  --color-primary-700: #1e4a73;
+  --color-primary-600: #245d8f;
+  --color-primary-100: #e8f0f8;
+  --color-primary-50: #f0f6fc;
+  --color-accent-600: #ea6a0a;
+  --color-accent-500: #f97316;
+  --color-accent-400: #fb923c;
+  --color-accent-100: #fef0e6;
+  --color-accent-50: #fff7f0;
+  --color-neutral-900: #111827;
+  --color-neutral-700: #374151;
+  --color-neutral-500: #6b7280;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-100: #f4f5f6;
+  --color-neutral-50: #f9fafb;
+  --color-white: #ffffff;
+  --color-success-700: #15803d;
+  --color-success-500: #16a34a;
+  --color-success-100: #dcfce7;
+  --color-warning-700: #b45309;
+  --color-warning-500: #f59e0b;
+  --color-warning-100: #fef3c7;
+  --color-danger-700: #b91c1c;
+  --color-danger-500: #ef4444;
+  --color-danger-100: #fee2e2;
+  --color-info-700: #1d4ed8;
+  --color-info-500: #3b82f6;
+  --color-info-100: #dbeafe;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md:
+    0 4px 6px rgba(0, 0, 0, 0.07),
+    0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px rgba(0, 0, 0, 0.1),
+    0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl:
+    0 20px 25px rgba(0, 0, 0, 0.1),
+    0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-navbar: 0 2px 8px rgba(27, 58, 92, 0.12);
+  --font-heading: "Plus Jakarta Sans", var(--font-geist-sans), system-ui, sans-serif;
+  --font-body: "Inter", var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono-ui: "JetBrains Mono", var(--font-geist-mono), monospace;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--color-white);
+  --color-primary-900: var(--color-primary-900);
+  --color-primary-800: var(--color-primary-800);
+  --color-primary-700: var(--color-primary-700);
+  --color-primary-600: var(--color-primary-600);
+  --color-primary-100: var(--color-primary-100);
+  --color-primary-50: var(--color-primary-50);
+  --color-accent-600: var(--color-accent-600);
+  --color-accent-500: var(--color-accent-500);
+  --color-accent-400: var(--color-accent-400);
+  --color-accent-100: var(--color-accent-100);
+  --color-accent-50: var(--color-accent-50);
+  --color-neutral-900: var(--color-neutral-900);
+  --color-neutral-700: var(--color-neutral-700);
+  --color-neutral-500: var(--color-neutral-500);
+  --color-neutral-300: var(--color-neutral-300);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-50: var(--color-neutral-50);
+  --color-white: var(--color-white);
+  --color-success-700: var(--color-success-700);
+  --color-success-500: var(--color-success-500);
+  --color-success-100: var(--color-success-100);
+  --color-warning-700: var(--color-warning-700);
+  --color-warning-500: var(--color-warning-500);
+  --color-warning-100: var(--color-warning-100);
+  --color-danger-700: var(--color-danger-700);
+  --color-danger-500: var(--color-danger-500);
+  --color-danger-100: var(--color-danger-100);
+  --color-info-700: var(--color-info-700);
+  --color-info-500: var(--color-info-500);
+  --color-info-100: var(--color-info-100);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono-ui);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-navbar: var(--shadow-navbar);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--color-neutral-200);
+}
+
+html {
+  background: var(--background);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(240, 246, 252, 0.96), transparent 30%),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent-500) 25%, white);
+  color: var(--color-primary-900);
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    color: var(--color-neutral-900);
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    @apply text-[2rem] leading-tight font-bold md:text-[2.25rem];
+  }
+
+  h2 {
+    @apply text-[1.75rem] leading-tight font-bold;
+  }
+
+  h3 {
+    @apply text-[1.375rem] leading-snug font-semibold;
+  }
+
+  h4 {
+    @apply text-[1.125rem] leading-snug font-semibold;
+  }
+
+  p {
+    @apply text-sm leading-6 text-neutral-700;
+  }
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-mono-ui {
+    font-family: var(--font-mono-ui);
+  }
+
+  .surface-card {
+    @apply rounded-lg border border-neutral-200 bg-white shadow-sm;
+  }
+
+  .surface-panel {
+    @apply rounded-xl border border-neutral-200 bg-white shadow-sm;
+  }
+
+  .app-container {
+    @apply mx-auto w-full max-w-7xl px-4 md:px-6 xl:px-8;
+  }
+
+  .page-section {
+    @apply py-12 md:py-16;
+  }
+
+  .text-display {
+    @apply text-[2rem] leading-tight font-extrabold md:text-[3rem];
+  }
+
+  .text-stat {
+    @apply text-[2rem] leading-none font-bold;
+  }
+
+  .text-label {
+    @apply text-xs leading-[1.4] font-medium;
+  }
+
+  .text-micro {
+    @apply text-[11px] leading-[1.4];
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

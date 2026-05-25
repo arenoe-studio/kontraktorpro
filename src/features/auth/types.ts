@@ -2,22 +2,22 @@ export type AuthIntent = "register" | "login" | "forgot-password";
 
 export type AuthRole = "contractor" | "moderator" | "super_admin";
 
-export type MockUser = {
+export type DbUser = {
   id: string;
   fullName: string;
   businessName: string;
-  phone: string;
+  email: string;
+  phone?: string;
   city: string;
-  password: string;
   role: AuthRole;
-  suspended?: boolean;
-  firstLogin?: boolean;
+  suspended: boolean;
+  firstLogin: boolean;
 };
 
 export type OtpChallengeSnapshot = {
   id: string;
   flow: AuthIntent;
-  maskedPhone: string;
+  maskedEmail: string;
   resendAvailableIn: number;
   resendsRemaining: number;
   attemptsRemaining: number;
@@ -25,7 +25,6 @@ export type OtpChallengeSnapshot = {
   isLocked: boolean;
   lockRemainingIn: number;
   isVerified: boolean;
-  debugCode: string;
 };
 
 export type ActionResult<T> = {
@@ -42,6 +41,6 @@ export type LoginSuccess = {
 
 export type PasswordResetState = {
   challenge: OtpChallengeSnapshot | null;
-  phone: string | null;
+  email: string | null;
   step: 1 | 2 | 3;
 };

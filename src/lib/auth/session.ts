@@ -2,12 +2,12 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getUserById } from "@/features/auth/mock-auth-service";
-import type { AuthRole, MockUser } from "@/features/auth/types";
+import { getUserById } from "@/features/auth/auth-service";
+import type { AuthRole, DbUser } from "@/features/auth/types";
 
 const SESSION_COOKIE = "kp-auth-session";
 
-export async function getCurrentUser(): Promise<MockUser | null> {
+export async function getCurrentUser(): Promise<DbUser | null> {
   const cookieStore = await cookies();
   const sessionUserId = cookieStore.get(SESSION_COOKIE)?.value;
 

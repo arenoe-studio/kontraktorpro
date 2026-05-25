@@ -9,25 +9,11 @@ import type {
 } from "./contracts";
 
 export const mockOtpService: AuthOtpService = {
-  async sendOtp(phone) {
+  async sendOtp(email, _code) {
     return {
       success: true,
-      data: { challengeId: `otp-${phone}` },
+      data: { challengeId: `otp-${email}` },
       message: "Kode OTP berhasil dikirim.",
-    };
-  },
-  async verifyOtp(_phone, code) {
-    if (code !== "123456") {
-      return {
-        success: false,
-        message: "Kode OTP tidak valid. Gunakan 123456 untuk mode demo.",
-      };
-    }
-
-    return {
-      success: true,
-      data: { verified: true },
-      message: "Nomor berhasil diverifikasi.",
     };
   },
 };

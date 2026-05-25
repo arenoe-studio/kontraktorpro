@@ -11,7 +11,8 @@ export type User = {
   id: string;
   fullName: string;
   businessName: string;
-  phone: string;
+  email: string;
+  phone?: string;
   city: string;
   role: Role;
   subscriptionTier: SubscriptionTier;

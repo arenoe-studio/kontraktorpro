@@ -1,13 +1,5 @@
-import { getPasswordResetStateFromCookie } from "@/features/auth/actions";
-import { AuthShell } from "@/features/auth/components/auth-shell";
-import { ForgotPasswordFlow } from "@/features/auth/components/forgot-password-flow";
+import { ForgotPasswordPage } from "../_components/ForgotPasswordPage";
 
-export default async function ForgotPasswordPage() {
-  const state = await getPasswordResetStateFromCookie();
-
-  return (
-    <AuthShell showBrandPanel={false}>
-      <ForgotPasswordFlow initialState={state} />
-    </AuthShell>
-  );
+export default function Page() {
+  return <ForgotPasswordPage />;
 }

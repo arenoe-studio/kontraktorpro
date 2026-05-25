@@ -1,4 +1,6 @@
-export type ProjectStatus = "aktif" | "tertunda" | "selesai" | "arsip";
+import { type ProjectStatus } from "@/lib/contracts/enums";
+export { formatCurrency, formatDate } from "@/lib/utils";
+
 export type ProjectTab = "wbs" | "reports" | "photos" | "team" | "materials" | "settings";
 
 export type WbsStatus = "Selesai" | "Dalam Pengerjaan" | "Belum Dimulai" | "Tertunda";
@@ -126,7 +128,7 @@ const projects: Project[] = [
     type: "Renovasi",
     owner: "Pak Hasan",
     location: "Bekasi Timur",
-    status: "aktif",
+    status: "active",
     progress: 72,
     startDate: "2026-03-10",
     targetDate: "2026-05-20",
@@ -393,7 +395,7 @@ const projects: Project[] = [
     type: "Ruko",
     owner: "Bu Nita",
     location: "Jatinegara, Jakarta Timur",
-    status: "aktif",
+    status: "active",
     progress: 48,
     startDate: "2026-02-02",
     targetDate: "2026-07-15",
@@ -439,7 +441,7 @@ const projects: Project[] = [
     type: "Renovasi",
     owner: "Mas Aldi",
     location: "Depok",
-    status: "tertunda",
+    status: "delayed",
     progress: 31,
     startDate: "2026-04-01",
     targetDate: "2026-06-18",
@@ -485,7 +487,7 @@ const projects: Project[] = [
     type: "Rumah Tinggal Baru",
     owner: "Ibu Siska",
     location: "Cibubur",
-    status: "selesai",
+    status: "completed",
     progress: 100,
     startDate: "2025-11-20",
     targetDate: "2026-03-30",
@@ -536,8 +538,8 @@ export function getProjectById(projectId: string) {
 }
 
 export function getDashboardSummary() {
-  const activeProjects = projects.filter((project) => project.status === "aktif");
-  const finishedProjects = projects.filter((project) => project.status === "selesai");
+  const activeProjects = projects.filter((project) => project.status === "active");
+  const finishedProjects = projects.filter((project) => project.status === "completed");
   const reportTargets = activeProjects.length;
   const reportsCompleted = activeProjects.filter(
     (project) => project.pendingReportsToday === 0
@@ -560,33 +562,18 @@ export function getDashboardSummary() {
 }
 
 export function getStatusBadgeVariant(status: ProjectStatus) {
-  if (status === "aktif") return "success";
-  if (status === "tertunda") return "warning";
-  if (status === "selesai") return "info";
+  if (status === "active") return "success";
+  if (status === "delayed") return "warning";
+  if (status === "completed") return "info";
   return "neutral";
 }
 
 export function getStatusLabel(status: ProjectStatus) {
-  if (status === "aktif") return "Aktif";
-  if (status === "tertunda") return "Tertunda";
-  if (status === "selesai") return "Selesai";
-  return "Arsip";
-}
-
-export function formatCurrency(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-export function formatDate(value: string) {
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
+  if (status === "active") return "Aktif";
+  if (status === "delayed") return "Tertunda";
+  if (status === "completed") return "Selesai";
+  if (status === "archived") return "Arsip";
+  return "Draft";
 }
 
 export function getDeadlineLabel(daysRemaining: number) {
@@ -597,10 +584,10 @@ export function getDeadlineLabel(daysRemaining: number) {
 
 export function getProjectCounts() {
   return {
-    semua: projects.filter((project) => project.status !== "arsip").length,
-    aktif: projects.filter((project) => project.status === "aktif").length,
-    tertunda: projects.filter((project) => project.status === "tertunda").length,
-    selesai: projects.filter((project) => project.status === "selesai").length,
-    arsip: projects.filter((project) => project.status === "arsip").length,
+    semua: projects.filter((project) => project.status !== "archived").length,
+    aktif: projects.filter((project) => project.status === "active").length,
+    tertunda: projects.filter((project) => project.status === "delayed").length,
+    selesai: projects.filter((project) => project.status === "completed").length,
+    arsip: projects.filter((project) => project.status === "archived").length,
   };
 }

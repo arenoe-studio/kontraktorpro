@@ -52,8 +52,8 @@ export function OtpVerificationForm({ challenge }: OtpVerificationFormProps) {
 
   const subtitle = useMemo(() => {
     return challengeState.flow === "register"
-      ? "Kode 6 digit telah dikirim ke nomor HP Anda untuk menyelesaikan pendaftaran."
-      : "Kode 6 digit telah dikirim ke nomor HP Anda untuk login tanpa password.";
+      ? "Kode 6 digit telah dikirim ke email Anda untuk menyelesaikan pendaftaran."
+      : "Kode 6 digit telah dikirim ke email Anda untuk login tanpa password.";
   }, [challengeState.flow]);
 
   return (
@@ -63,7 +63,7 @@ export function OtpVerificationForm({ challenge }: OtpVerificationFormProps) {
         <div className="space-y-2">
           <p>{subtitle}</p>
           <p className="font-semibold text-[var(--kp-neutral-700)]">
-            {challengeState.maskedPhone}
+            {challengeState.maskedEmail}
           </p>
           <p className="text-xs">
             Bukan nomor saya?{" "}
@@ -73,15 +73,7 @@ export function OtpVerificationForm({ challenge }: OtpVerificationFormProps) {
           </p>
         </div>
       }
-      footer={
-        <span>
-          Halaman ini hanya aktif selama 5 menit. Untuk demo lokal, gunakan kode{" "}
-          <span className="font-mono font-semibold text-[var(--kp-primary-800)]">
-            {challengeState.debugCode}
-          </span>
-          .
-        </span>
-      }
+      footer="Periksa inbox email Anda. Kode berlaku 15 menit."
     >
       <form
         className="space-y-6"

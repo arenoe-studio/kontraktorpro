@@ -52,7 +52,7 @@ export function RegisterForm() {
   return (
     <FormCard
       title="Buat Akun Gratis"
-      description="Daftar cepat dengan nomor HP aktif agar Anda bisa langsung mulai mengelola proyek."
+      description="Daftar cepat dengan email aktif agar Anda bisa langsung mulai mengelola proyek."
       footer={footer}
     >
       <form
@@ -97,12 +97,12 @@ export function RegisterForm() {
         </Field>
 
         <Field
-          label="Nomor HP"
-          htmlFor="phone"
-          error={errors.phone?.message}
-          helper="Nomor ini akan digunakan untuk login dan verifikasi OTP."
+          label="Email"
+          htmlFor="email"
+          error={errors.email?.message}
+          helper="Email ini akan digunakan untuk login dan menerima kode OTP."
         >
-          <TextInput id="phone" inputMode="numeric" placeholder="08123456789" error={errors.phone?.message} {...register("phone")} />
+          <TextInput id="email" type="email" inputMode="email" placeholder="nama@email.com" error={errors.email?.message} {...register("email")} />
         </Field>
 
         <Field label="Kota Operasional" htmlFor="city" error={errors.city?.message}>

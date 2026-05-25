@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 
 import {
-  forgotPasswordPhoneSchema,
+  forgotPasswordEmailSchema,
   loginSchema,
   otpSchema,
   registerSchema,
@@ -18,7 +18,7 @@ import {
   startPasswordReset,
   startRegistration,
   verifyChallengeCode,
-} from "./mock-auth-service";
+} from "./auth-service";
 import type {
   ActionResult,
   LoginSuccess,
@@ -56,7 +56,7 @@ async function setSessionCookie(userId: string) {
   cookieStore.set(SESSION_COOKIE, userId, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: true,
       path: "/",
       maxAge: 30 * 24 * 60 * 60,
     });
@@ -67,7 +67,7 @@ async function setOtpCookie(challengeId: string) {
   cookieStore.set(OTP_CHALLENGE_COOKIE, challengeId, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: true,
       path: "/",
       maxAge: 15 * 60,
     });
@@ -78,7 +78,7 @@ async function setResetCookie(challengeId: string) {
   cookieStore.set(RESET_CHALLENGE_COOKIE, challengeId, {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: true,
       path: "/forgot-password",
       maxAge: 15 * 60,
     });
@@ -108,7 +108,7 @@ export async function registerAction(
   const result = await startRegistration({
     fullName: parsed.data.fullName,
     businessName: parsed.data.businessName,
-    phone: parsed.data.phone,
+    email: parsed.data.email,
     city: parsed.data.city,
     password: parsed.data.password,
   });
@@ -125,7 +125,7 @@ export async function registerAction(
 
   return {
     success: true,
-    message: "Kode OTP dikirim ke nomor Anda.",
+    message: "Kode OTP dikirim ke email Anda.",
     data: result.challenge,
   };
 }
@@ -149,7 +149,7 @@ export async function loginWithPasswordAction(
     };
   }
 
-  const result = await loginWithPassword(parsed.data.phone, password);
+  const result = await loginWithPassword(parsed.data.email, password);
   if (!result.success) {
     return {
       success: false,
@@ -178,7 +178,7 @@ export async function requestLoginOtpAction(
     };
   }
 
-  const result = await startLoginOtp(parsed.data.phone);
+  const result = await startLoginOtp(parsed.data.email);
   if (!result.success) {
     return {
       success: false,
@@ -282,7 +282,7 @@ export async function resendCurrentOtpAction(): Promise<
 export async function requestPasswordResetAction(
   input: unknown,
 ): Promise<ActionResult<PasswordResetState>> {
-  const parsed = forgotPasswordPhoneSchema.safeParse(input);
+  const parsed = forgotPasswordEmailSchema.safeParse(input);
   if (!parsed.success) {
     return {
       success: false,
@@ -290,7 +290,7 @@ export async function requestPasswordResetAction(
     };
   }
 
-  const result = await startPasswordReset(parsed.data.phone);
+  const result = await startPasswordReset(parsed.data.email);
   if (!result.success) {
     const errorMessage =
       "message" in result && typeof result.message === "string"
@@ -311,7 +311,7 @@ export async function requestPasswordResetAction(
     message: "Kode OTP reset password berhasil dikirim.",
     data: {
       challenge: result.challenge,
-      phone: result.phone,
+      email: result.email,
       step: 2,
     },
   };
@@ -343,7 +343,7 @@ export async function verifyPasswordResetOtpAction(
       message: result.message,
       data: {
         challenge: result.challenge ?? null,
-        phone: null,
+        email: null,
         step: 2,
       },
     };
@@ -354,7 +354,7 @@ export async function verifyPasswordResetOtpAction(
     message: "Kode OTP berhasil diverifikasi.",
     data: {
       challenge: result.challenge,
-      phone: result.challenge.maskedPhone,
+      email: result.challenge.maskedEmail,
       step: 3,
     },
   };
@@ -378,7 +378,7 @@ export async function resendPasswordResetOtpAction(): Promise<
       message: result.message,
       data: {
         challenge: result.challenge ?? null,
-        phone: null,
+        email: null,
         step: 2,
       },
     };
@@ -389,7 +389,7 @@ export async function resendPasswordResetOtpAction(): Promise<
     message: "Kode OTP baru berhasil dikirim.",
     data: {
       challenge: result.challenge,
-      phone: null,
+      email: null,
       step: 2,
     },
   };
@@ -397,7 +397,7 @@ export async function resendPasswordResetOtpAction(): Promise<
 
 export async function resetPasswordAction(
   input: unknown,
-): Promise<ActionResult<{ phone: string; redirectTo: string }>> {
+): Promise<ActionResult<{ email: string; redirectTo: string }>> {
   const parsed = resetPasswordSchema.safeParse(input);
   if (!parsed.success) {
     return {
@@ -429,8 +429,8 @@ export async function resetPasswordAction(
     success: true,
     message: "Password berhasil diubah.",
     data: {
-      phone: result.phone,
-      redirectTo: `/login?phone=${encodeURIComponent(result.phone)}`,
+      email: result.email,
+      redirectTo: `/login?email=${encodeURIComponent(result.email)}`,
     },
   };
 }
@@ -449,7 +449,7 @@ export async function getPasswordResetStateFromCookie(): Promise<PasswordResetSt
   if (!challengeId) {
     return {
       challenge: null,
-      phone: null,
+      email: null,
       step: 1,
     };
   }
@@ -459,14 +459,14 @@ export async function getPasswordResetStateFromCookie(): Promise<PasswordResetSt
     await clearResetCookie();
     return {
       challenge: null,
-      phone: null,
+      email: null,
       step: 1,
     };
   }
 
   return {
     challenge,
-    phone: null,
+    email: null,
     step: challenge.isVerified ? 3 : 2,
   };
 }

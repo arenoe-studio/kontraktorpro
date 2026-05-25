@@ -14,6 +14,12 @@ export const roleEnum = pgEnum("role", [
   "moderator",
   "super_admin",
 ]);
+
+export const authIntentEnum = pgEnum("auth_intent", [
+  "register",
+  "login",
+  "forgot-password",
+]);
 export const subscriptionTierEnum = pgEnum("subscription_tier", [
   "free",
   "pro",
@@ -41,13 +47,16 @@ export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   fullName: varchar("full_name", { length: 160 }).notNull(),
   businessName: varchar("business_name", { length: 160 }).notNull(),
-  phone: varchar("phone", { length: 24 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  phone: varchar("phone", { length: 24 }).unique(),
   city: varchar("city", { length: 120 }).notNull(),
   role: roleEnum("role").default("contractor").notNull(),
   subscriptionTier: subscriptionTierEnum("subscription_tier")
     .default("free")
     .notNull(),
   passwordHash: text("password_hash").notNull(),
+  suspended: boolean("suspended").default(false).notNull(),
+  firstLogin: boolean("first_login").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -124,5 +133,20 @@ export const portfolioEntries = pgTable("portfolio_entries", {
   userId: uuid("user_id").notNull(),
   title: varchar("title", { length: 180 }).notNull(),
   status: moderationStatusEnum("status").default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const otpChallenges = pgTable("otp_challenges", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  flow: authIntentEnum("flow").notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  codeHash: text("code_hash").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  resendAvailableAt: timestamp("resend_available_at").notNull(),
+  resendCount: integer("resend_count").default(0).notNull(),
+  attemptsRemaining: integer("attempts_remaining").default(5).notNull(),
+  lockedUntil: timestamp("locked_until"),
+  isVerified: boolean("is_verified").default(false).notNull(),
+  metadata: text("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

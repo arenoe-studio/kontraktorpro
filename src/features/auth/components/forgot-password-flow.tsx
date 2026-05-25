@@ -13,10 +13,10 @@ import {
   verifyPasswordResetOtpAction,
 } from "../actions";
 import {
-  forgotPasswordPhoneSchema,
+  forgotPasswordEmailSchema,
   otpSchema,
   resetPasswordSchema,
-  type ForgotPasswordPhoneValues,
+  type ForgotPasswordEmailValues,
   type OtpFormValues,
   type ResetPasswordValues,
 } from "../schemas";
@@ -35,7 +35,7 @@ type ForgotPasswordFlowProps = {
 };
 
 const steps = [
-  "Masukkan Nomor HP",
+  "Masukkan Email",
   "Verifikasi OTP",
   "Buat Password Baru",
 ] as const;
@@ -50,11 +50,11 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const phoneForm = useForm<ForgotPasswordPhoneValues>({
-    resolver: zodResolver(forgotPasswordPhoneSchema),
+  const phoneForm = useForm<ForgotPasswordEmailValues>({
+    resolver: zodResolver(forgotPasswordEmailSchema),
     mode: "onBlur",
     defaultValues: {
-      phone: "",
+      email: "",
     },
   });
 
@@ -130,7 +130,7 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
           </div>
           <p className="text-sm leading-6 text-[var(--kp-neutral-500)]">
             {state.step === 1
-              ? "Masukkan nomor HP terdaftar. Kami akan kirim kode verifikasi."
+              ? "Masukkan email terdaftar. Kami akan kirim kode verifikasi."
               : state.step === 2
                 ? "Masukkan 6 digit kode OTP untuk lanjut membuat password baru."
                 : "Password baru harus berbeda dari password sebelumnya."}
@@ -155,23 +155,23 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
                   if (result.fieldErrors) {
                     Object.entries(result.fieldErrors).forEach(([field, message]) => {
                       if (message) {
-                        phoneForm.setError(field as keyof ForgotPasswordPhoneValues, {
+                        phoneForm.setError(field as keyof ForgotPasswordEmailValues, {
                           message,
                         });
                       }
                     });
                   }
-                  setError(result.message ?? "Nomor HP belum bisa diproses.");
+                  setError(result.message ?? "Email belum bisa diproses.");
                   return;
                 }
 
-                setState(result.data ?? { challenge: null, phone: null, step: 2 });
+                setState(result.data ?? { challenge: null, email: null, step: 2 });
                 setMessage("Kode OTP berhasil dikirim.");
               });
             })}
           >
-            <Field label="Nomor HP" htmlFor="phone" error={phoneForm.formState.errors.phone?.message}>
-              <TextInput id="phone" inputMode="numeric" placeholder="08123456789" error={phoneForm.formState.errors.phone?.message} {...phoneForm.register("phone")} />
+            <Field label="Email" htmlFor="email" error={phoneForm.formState.errors.email?.message}>
+              <TextInput id="email" type="email" inputMode="email" placeholder="nama@email.com" error={phoneForm.formState.errors.email?.message} {...phoneForm.register("email")} />
             </Field>
 
             <PrimaryButton type="submit" disabled={pending}>
@@ -213,13 +213,6 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
                 hasError={Boolean(otpForm.formState.errors.code || error)}
                 disabled={state.challenge.isLocked}
               />
-              <p className="text-xs text-[var(--kp-neutral-500)]">
-                Demo lokal: gunakan kode{" "}
-                <span className="font-mono font-semibold text-[var(--kp-primary-800)]">
-                  {state.challenge.debugCode}
-                </span>
-                .
-              </p>
             </div>
 
             <PrimaryButton

@@ -1,50 +1,11 @@
-import { notFound } from "next/navigation";
-import {
-  getProjectById,
-  type ProjectTab,
-} from "../../_components/mock-data";
-import { ProjectDetailContent } from "../../_components/project-detail-content";
+import { ProjectDetailPage } from "../../_components/ProjectDetailPage";
 
-type ProjectPageSearchParams = Promise<{
-  tab?: string;
-  modal?: string;
-}>;
-
-function normalizeTab(tab?: string): ProjectTab {
-  if (
-    tab === "wbs" ||
-    tab === "reports" ||
-    tab === "photos" ||
-    tab === "team" ||
-    tab === "materials" ||
-    tab === "settings"
-  ) {
-    return tab;
-  }
-
-  return "wbs";
-}
-
-export default async function ProjectDetailPage({
+export default function Page({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: ProjectPageSearchParams;
+  searchParams: Promise<{ tab?: string; modal?: string }>;
 }) {
-  const { id } = await params;
-  const query = await searchParams;
-  const project = getProjectById(id);
-
-  if (!project) {
-    notFound();
-  }
-
-  return (
-    <ProjectDetailContent
-      project={project}
-      tab={normalizeTab(query.tab)}
-      showPdfModal={query.modal === "pdf"}
-    />
-  );
+  return <ProjectDetailPage params={params} searchParams={searchParams} />;
 }

@@ -18,6 +18,7 @@ export const mockCurrentUser: User = {
   id: "user-1",
   fullName: "Budi Santoso",
   businessName: "CV Maju Jaya Konstruksi",
+  email: "budi@cvmajujaya.com",
   phone: "081234567890",
   city: "Bandung",
   role: "contractor",

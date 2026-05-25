@@ -1,18 +1,9 @@
-import { notFound } from "next/navigation";
-import { getProjectById } from "../../../_components/mock-data";
-import { ProjectFormShell } from "../../../_components/project-form-shell";
+import { EditProjectPage } from "../../../_components/EditProjectPage";
 
-export default async function EditProjectPage({
+export default function Page({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const project = getProjectById(id);
-
-  if (!project) {
-    notFound();
-  }
-
-  return <ProjectFormShell mode="edit" project={project} />;
+  return <EditProjectPage params={params} />;
 }

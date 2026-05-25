@@ -18,10 +18,10 @@ import {
 } from "./form-primitives";
 
 type LoginFormProps = {
-  defaultPhone?: string;
+  defaultEmail?: string;
 };
 
-export function LoginForm({ defaultPhone }: LoginFormProps) {
+export function LoginForm({ defaultEmail }: LoginFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [mode, setMode] = useState<"password" | "otp">("password");
@@ -40,7 +40,7 @@ export function LoginForm({ defaultPhone }: LoginFormProps) {
     mode: "onBlur",
     defaultValues: {
       mode: "password",
-      phone: defaultPhone ?? "",
+      email: defaultEmail ?? "",
       password: "",
     },
   });
@@ -67,7 +67,7 @@ export function LoginForm({ defaultPhone }: LoginFormProps) {
   return (
     <FormCard
       title="Masuk ke KontraktorPro"
-      description="Masuk dengan password atau minta OTP langsung ke nomor HP aktif Anda."
+      description="Masuk dengan password atau minta OTP langsung ke email aktif Anda."
       footer={footer}
     >
       <form
@@ -115,8 +115,8 @@ export function LoginForm({ defaultPhone }: LoginFormProps) {
       >
         {formError ? <InlineAlert tone="danger">{formError}</InlineAlert> : null}
 
-        <Field label="Nomor HP" htmlFor="phone" error={errors.phone?.message}>
-          <TextInput id="phone" inputMode="numeric" placeholder="08123456789" error={errors.phone?.message} {...register("phone")} />
+        <Field label="Email" htmlFor="email" error={errors.email?.message}>
+          <TextInput id="email" type="email" inputMode="email" placeholder="nama@email.com" error={errors.email?.message} {...register("email")} />
         </Field>
 
         {passwordVisible ? (
@@ -150,7 +150,7 @@ export function LoginForm({ defaultPhone }: LoginFormProps) {
           </Field>
         ) : (
           <InlineAlert>
-            Password disembunyikan. Kami akan kirim kode OTP 6 digit ke nomor HP Anda.
+            Password disembunyikan. Kami akan kirim kode OTP 6 digit ke email Anda.
           </InlineAlert>
         )}
 

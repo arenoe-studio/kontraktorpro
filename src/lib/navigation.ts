@@ -6,8 +6,6 @@ import {
   Globe,
   Home,
   Layers3,
-  Settings,
-  Shield,
   Users,
 } from "lucide-react";
 
@@ -20,41 +18,27 @@ export const marketingNavigation = [
 
 export const contractorSidebarNavigation = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/proyek", label: "Proyek Saya", icon: FolderKanban },
-  { href: "/portofolio", label: "Portofolio", icon: Globe },
-  { href: "/langganan", label: "Langganan", icon: CreditCard },
-  { href: "/pengaturan-akun", label: "Pengaturan", icon: Settings },
+  { href: "/projects", label: "Proyek Saya", icon: FolderKanban },
+  { href: "/billing", label: "Langganan", icon: CreditCard },
 ];
 
 export const adminSidebarNavigation = {
   overview: [
     { href: "/admin", label: "Dashboard", icon: Home },
-    { href: "/admin/aktivitas", label: "Aktivitas Real-time", icon: Layers3 },
   ],
   users: [
-    { href: "/admin/pengguna", label: "Semua Pengguna", icon: Users },
-    { href: "/admin/verifikasi", label: "Verifikasi Akun", icon: Shield },
-    { href: "/admin/laporan", label: "Laporan Pengguna", icon: ClipboardList },
+    { href: "/admin/users", label: "Semua Pengguna", icon: Users },
   ],
   content: [
-    {
-      href: "/admin/moderasi-portofolio",
-      label: "Moderasi Portofolio",
-      icon: Globe,
-    },
-    {
-      href: "/admin/moderasi-ulasan",
-      label: "Moderasi Ulasan",
-      icon: ClipboardList,
-    },
+    { href: "/admin/moderation/portfolio", label: "Moderasi Portofolio", icon: Globe },
+    { href: "/admin/moderation/reviews", label: "Moderasi Ulasan", icon: ClipboardList },
   ],
   business: [
-    { href: "/admin/paket", label: "Paket & Harga", icon: CreditCard },
-    { href: "/admin/keuangan", label: "Keuangan & MRR", icon: Layers3 },
+    { href: "/admin/packages", label: "Paket & Harga", icon: CreditCard },
+    { href: "/admin/finance", label: "Keuangan & MRR", icon: Layers3 },
   ],
   system: [
-    { href: "/admin/log-aktivitas", label: "Log Aktivitas", icon: ClipboardList },
-    { href: "/admin/notifikasi", label: "Notifikasi Sistem", icon: Shield },
+    { href: "/admin/logs", label: "Log Aktivitas", icon: ClipboardList },
   ],
 };
 

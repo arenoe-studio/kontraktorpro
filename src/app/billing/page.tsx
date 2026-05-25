@@ -1,17 +1,5 @@
-import { AppNavbar } from "@/components/layout/app-navbar";
-import { BillingOverview } from "./_components/billing-overview";
+import { BillingPage } from "./_components/BillingPage";
 
-export default function BillingPage() {
-  return (
-    <div className="min-h-screen bg-neutral-50">
-      <AppNavbar
-        links={[
-          { href: "/billing", label: "Billing" },
-          { href: "/billing/checkout", label: "Checkout" },
-          { href: "/admin", label: "Admin Mock" },
-        ]}
-      />
-      <BillingOverview />
-    </div>
-  );
+export default function Page() {
+  return <BillingPage />;
 }

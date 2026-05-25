@@ -6,11 +6,10 @@ export type ActionResult<T> =
   | { success: false; message: string; errors?: Record<string, string[]> };
 
 export interface AuthOtpService {
-  sendOtp(phone: string): Promise<ActionResult<{ challengeId: string }>>;
-  verifyOtp(
-    phone: string,
+  sendOtp(
+    email: string,
     code: string,
-  ): Promise<ActionResult<{ verified: true }>>;
+  ): Promise<ActionResult<{ challengeId: string }>>;
 }
 
 export interface FileStorageService {

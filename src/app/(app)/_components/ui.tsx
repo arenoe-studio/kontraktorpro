@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import {
   ArrowRight,
   Building2,
@@ -34,10 +35,6 @@ const palette = {
   info: "#3B82F6",
   infoSoft: "#DBEAFE",
 };
-
-export function cn(...values: Array<string | false | null | undefined>) {
-  return values.filter(Boolean).join(" ");
-}
 
 const buttonVariants = {
   primary: `bg-[${palette.accent}] text-white hover:opacity-95`,

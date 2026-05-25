@@ -1,16 +1,9 @@
-import { AuthShell } from "@/features/auth/components/auth-shell";
-import { LoginForm } from "@/features/auth/components/login-form";
+import { LoginPage } from "../_components/LoginPage";
 
-export default async function LoginPage({
+export default function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ phone?: string }>;
+  searchParams: Promise<{ email?: string }>;
 }) {
-  const params = await searchParams;
-
-  return (
-    <AuthShell>
-      <LoginForm defaultPhone={params.phone} />
-    </AuthShell>
-  );
+  return <LoginPage searchParams={searchParams} />;
 }

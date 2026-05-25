@@ -13,17 +13,7 @@ export const cityOptions = [
   "Denpasar",
 ] as const;
 
-const phoneSchema = z
-  .string()
-  .trim()
-  .min(1, "Nomor HP wajib diisi.")
-  .transform((value) => value.replace(/\D/g, ""))
-  .refine((value) => value.startsWith("08"), {
-    message: "Nomor HP harus diawali 08.",
-  })
-  .refine((value) => value.length >= 10, {
-    message: "Nomor HP minimal 10 digit.",
-  });
+const emailSchema = z.string().trim().email("Format email tidak valid.");
 
 const passwordSchema = z
   .string()
@@ -33,7 +23,7 @@ export const registerSchema = z
   .object({
     fullName: z.string().trim().min(1, "Nama lengkap wajib diisi."),
     businessName: z.string().trim().min(1, "Nama usaha wajib diisi."),
-    phone: phoneSchema,
+    email: emailSchema,
     city: z.enum(cityOptions, {
       error: "Pilih kota operasional.",
     }),
@@ -49,7 +39,7 @@ export const registerSchema = z
   });
 
 export const loginSchema = z.object({
-  phone: phoneSchema,
+  email: emailSchema,
   password: z.string().optional(),
   mode: z.enum(["password", "otp"]),
 }).superRefine((data, ctx) => {
@@ -70,8 +60,8 @@ export const otpSchema = z.object({
     .regex(/^\d{6}$/, "Kode OTP harus berupa 6 digit angka."),
 });
 
-export const forgotPasswordPhoneSchema = z.object({
-  phone: phoneSchema,
+export const forgotPasswordEmailSchema = z.object({
+  email: emailSchema,
 });
 
 export const resetPasswordSchema = z
@@ -87,7 +77,7 @@ export const resetPasswordSchema = z
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type OtpFormValues = z.infer<typeof otpSchema>;
-export type ForgotPasswordPhoneValues = z.infer<
-  typeof forgotPasswordPhoneSchema
+export type ForgotPasswordEmailValues = z.infer<
+  typeof forgotPasswordEmailSchema
 >;
 export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;

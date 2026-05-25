@@ -1,6 +1,5 @@
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
-import type { NeonDatabase } from "drizzle-orm/neon-serverless";
 import * as schema from "./schema";
 
 // In Node.js (local dev), we need the `ws` package as WebSocket adapter.
@@ -10,19 +9,32 @@ if (typeof globalThis.WebSocket === "undefined") {
   neonConfig.webSocketConstructor = require("ws");
 }
 
-let _db: NeonDatabase<typeof schema> | null = null;
+function createDb() {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+  return drizzle(pool, { schema });
+}
+
+// Singleton — created on first use, not at module load time
+let _db: ReturnType<typeof createDb> | null = null;
 
 export function getDb() {
   if (!_db) {
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
-    _db = drizzle(pool, { schema });
+    _db = createDb();
   }
   return _db;
 }
 
-// Default export for backward compatibility
-export const db = new Proxy({} as NeonDatabase<typeof schema>, {
-  get(_target, prop) {
-    return (getDb() as unknown as Record<string | symbol, unknown>)[prop];
+// Re-export as `db` for all existing imports — calls getDb() lazily
+export const db = new Proxy({} as ReturnType<typeof createDb>, {
+  get(_target, prop, receiver) {
+    const instance = getDb();
+    const value = Reflect.get(instance, prop, receiver);
+    if (typeof value === "function") {
+      return value.bind(instance);
+    }
+    return value;
+  },
+  has(_target, prop) {
+    return Reflect.has(getDb(), prop);
   },
 });

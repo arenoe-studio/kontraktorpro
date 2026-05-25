@@ -117,7 +117,7 @@ export async function registerAction(
     return {
       success: false,
       fieldErrors: normalizeFieldErrors(result.fieldErrors),
-      message: "Pendaftaran belum bisa diproses.",
+      message: result.message ?? "Pendaftaran belum bisa diproses.",
     };
   }
 

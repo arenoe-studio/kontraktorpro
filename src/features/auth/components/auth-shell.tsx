@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 
 type AuthShellProps = {
@@ -53,7 +54,14 @@ export function AuthShell({
             <div className="space-y-10">
               <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold">
                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-xl font-black text-white">
-                  KP
+                  <Image
+                    src="/logo-only.png"
+                    alt="KontraktorPro"
+                    width={32}
+                    height={32}
+                    priority
+                    className="h-8 w-8"
+                  />
                 </span>
                 <span>KontraktorPro</span>
               </Link>
@@ -86,7 +94,14 @@ export function AuthShell({
             <div className="mb-6 lg:hidden">
               <Link href="/" className="inline-flex items-center gap-3 text-base font-semibold text-[var(--kp-primary-800)]">
                 <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--kp-primary-800)] text-sm font-black text-white">
-                  KP
+                  <Image
+                    src="/logo-only.png"
+                    alt="KontraktorPro"
+                    width={28}
+                    height={28}
+                    priority
+                    className="h-7 w-7"
+                  />
                 </span>
                 <span>KontraktorPro</span>
               </Link>

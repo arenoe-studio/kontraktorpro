@@ -29,12 +29,12 @@ export default async function ProjectDetailPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ projectId: string }>;
+  params: Promise<{ id: string }>;
   searchParams: ProjectPageSearchParams;
 }) {
-  const { projectId } = await params;
+  const { id } = await params;
   const query = await searchParams;
-  const project = getProjectById(projectId);
+  const project = getProjectById(id);
 
   if (!project) {
     notFound();

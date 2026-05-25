@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -113,8 +114,8 @@ export function MarketingNavbar({ minimal = false }: { minimal?: boolean }) {
     >
       <Container className="flex min-h-16 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-800 text-sm font-bold text-white">
-            KP
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/10">
+            <Image src="/logo-only.png" alt="KontraktorPro" width={32} height={32} priority className="h-8 w-8" />
           </div>
           <div>
             <p className="font-semibold text-slate-900">KontraktorPro</p>
@@ -185,7 +186,7 @@ export function MarketingFooter() {
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-sm font-bold text-slate-900">
-              KP
+              <Image src="/logo-only.png" alt="KontraktorPro" width={32} height={32} priority className="h-8 w-8" />
             </div>
             <div>
               <p className="font-semibold text-white">KontraktorPro</p>

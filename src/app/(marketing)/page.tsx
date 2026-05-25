@@ -208,7 +208,7 @@ export default function LandingPage() {
         <Section className="bg-slate-800 text-white">
           <Container>
             <div className="max-w-3xl">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
                 Apa bedanya sama WhatsApp dan Excel?
               </h2>
               <p className="mt-4 text-base leading-8 text-slate-300">Tidak harus tinggalkan WhatsApp. KontraktorPro justru merapikan apa yang selama ini tercecer.</p>
@@ -307,7 +307,7 @@ export default function LandingPage() {
 
         <Section className="bg-slate-800 text-white">
           <Container className="text-center">
-            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">Mulai kelola proyek pertama Anda hari ini.</h2>
+            <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Mulai kelola proyek pertama Anda hari ini.</h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
               Setup 3 menit. Tidak perlu pelatihan. Gratis untuk memulai.
             </p>

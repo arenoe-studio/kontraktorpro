@@ -5,10 +5,10 @@ import { ProjectFormShell } from "../../../_components/project-form-shell";
 export default async function EditProjectPage({
   params,
 }: {
-  params: Promise<{ projectId: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { projectId } = await params;
-  const project = getProjectById(projectId);
+  const { id } = await params;
+  const project = getProjectById(id);
 
   if (!project) {
     notFound();

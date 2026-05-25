@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/ui/cn";
@@ -26,7 +28,19 @@ export interface AppSidebarProps {
 }
 
 export function AppSidebar({
-  logo = <span className="font-heading text-xl font-bold text-white">KontraktorPro</span>,
+  logo = (
+    <Link href="/" className="inline-flex items-center">
+      <Image
+        src="/logo-only.png"
+        alt="KontraktorPro"
+        width={40}
+        height={40}
+        priority
+        className="h-10 w-10"
+      />
+      <span className="sr-only">KontraktorPro</span>
+    </Link>
+  ),
   sections,
   packageSlot,
   variant = "contractor",

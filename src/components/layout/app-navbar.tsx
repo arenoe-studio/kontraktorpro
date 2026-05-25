@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/ui/cn";
@@ -19,7 +21,19 @@ export interface AppNavbarProps {
 
 export function AppNavbar({
   links = [],
-  logo = <span className="font-heading text-xl font-bold text-primary-800">KontraktorPro</span>,
+  logo = (
+    <Link href="/" className="inline-flex items-center">
+      <Image
+        src="/logo-only.png"
+        alt="KontraktorPro"
+        width={36}
+        height={36}
+        priority
+        className="h-9 w-9"
+      />
+      <span className="sr-only">KontraktorPro</span>
+    </Link>
+  ),
   className,
   onMenuClick,
   rightSlot,

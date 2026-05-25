@@ -17,13 +17,13 @@ export default async function AdminUserDetailPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ userId: string }>;
+  params: Promise<{ id: string }>;
   searchParams: Promise<{ role?: string }>;
 }) {
   const route = await params;
   const query = await searchParams;
   const role = resolveAdminRole(query.role);
-  const user = userRows.find((item) => item.id === route.userId);
+  const user = userRows.find((item) => item.id === route.id);
 
   if (!user) {
     notFound();
@@ -213,3 +213,4 @@ export default async function AdminUserDetailPage({
     </AdminShell>
   );
 }
+

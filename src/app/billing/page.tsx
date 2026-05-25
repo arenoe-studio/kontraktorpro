@@ -1,5 +1,5 @@
 import { AppNavbar } from "@/components/layout/app-navbar";
-import { BillingOverview } from "../_components/billing-overview";
+import { BillingOverview } from "./_components/billing-overview";
 
 export default function BillingPage() {
   return (
@@ -7,7 +7,7 @@ export default function BillingPage() {
       <AppNavbar
         links={[
           { href: "/billing", label: "Billing" },
-          { href: "/checkout", label: "Checkout" },
+          { href: "/billing/checkout", label: "Checkout" },
           { href: "/admin", label: "Admin Mock" },
         ]}
       />

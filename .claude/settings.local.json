@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Copy-Item -Path \"src/app/billing/billing/page.tsx\" -Destination \"src/app/billing/page.tsx\" -Force)",
+      "Bash(git add *)"
+    ]
+  }
+}

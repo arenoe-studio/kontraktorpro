@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Bell,
@@ -10,7 +11,6 @@ import {
   Home,
   Menu,
   Settings,
-  Sparkles,
   UserCircle2,
 } from "lucide-react";
 import { cn } from "./ui";
@@ -40,8 +40,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col bg-slate-900 px-4 py-6 text-white lg:flex">
         <div className="flex items-center gap-3 px-2">
-          <div className="rounded-2xl bg-orange-500 p-2 text-white">
-            <Sparkles className="size-5" />
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-white/10">
+            <Image src="/logo-only.png" alt="KontraktorPro" width={32} height={32} priority className="h-8 w-8" />
           </div>
           <div>
             <p className="text-lg font-bold">KontraktorPro</p>

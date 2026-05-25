@@ -1,5 +1,6 @@
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import type { NeonDatabase } from "drizzle-orm/neon-serverless";
 import * as schema from "./schema";
 
 // In Node.js (local dev), we need the `ws` package as WebSocket adapter.
@@ -9,5 +10,19 @@ if (typeof globalThis.WebSocket === "undefined") {
   neonConfig.webSocketConstructor = require("ws");
 }
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
-export const db = drizzle(pool, { schema });
+let _db: NeonDatabase<typeof schema> | null = null;
+
+export function getDb() {
+  if (!_db) {
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+    _db = drizzle(pool, { schema });
+  }
+  return _db;
+}
+
+// Default export for backward compatibility
+export const db = new Proxy({} as NeonDatabase<typeof schema>, {
+  get(_target, prop) {
+    return (getDb() as unknown as Record<string | symbol, unknown>)[prop];
+  },
+});

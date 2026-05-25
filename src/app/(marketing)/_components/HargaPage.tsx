@@ -98,7 +98,7 @@ export function HargaPage() {
         <Section className="bg-slate-800 text-white">
           <Container className="text-center">
             <h2 className="text-4xl font-bold tracking-tight">Mulai gratis hari ini.</h2>
-            <Link href="/daftar" className={buttonClasses("primary", "xl") + " mt-8"}>
+            <Link href="/register" className={buttonClasses("primary", "xl") + " mt-8"}>
               Daftar Gratis Sekarang
             </Link>
             <p className="mt-4 text-xs text-slate-300">Tidak perlu kartu kredit.</p>

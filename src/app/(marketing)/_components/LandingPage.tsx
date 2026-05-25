@@ -42,7 +42,7 @@ export function LandingPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link href="/daftar" className={buttonClasses("primary", "xl")}>
+                <Link href="/register" className={buttonClasses("primary", "xl")}>
                   Coba Gratis Sekarang
                 </Link>
                 <Link href="/#fitur" className={buttonClasses("ghost", "lg")}>
@@ -285,7 +285,7 @@ export function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/daftar" className={buttonClasses(plan.featured ? "primary" : "outline", "lg") + " mt-6 w-full"}>
+                  <Link href="/register" className={buttonClasses(plan.featured ? "primary" : "outline", "lg") + " mt-6 w-full"}>
                     {plan.cta}
                   </Link>
                 </article>
@@ -306,10 +306,10 @@ export function LandingPage() {
               Setup 3 menit. Tidak perlu pelatihan. Gratis untuk memulai.
             </p>
             <div className="mt-8 flex flex-col items-center gap-4">
-              <Link href="/daftar" className={buttonClasses("primary", "xl")}>
+              <Link href="/register" className={buttonClasses("primary", "xl")}>
                 Daftar Gratis Sekarang
               </Link>
-              <Link href="/masuk" className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white">
+              <Link href="/login" className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white">
                 Sudah punya akun? Masuk di sini.
                 <PlayCircle className="h-4 w-4" />
               </Link>

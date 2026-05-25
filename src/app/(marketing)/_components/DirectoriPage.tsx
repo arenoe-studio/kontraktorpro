@@ -117,7 +117,7 @@ export async function DirectoriPage({
               <p className="mt-3 max-w-2xl text-base leading-8 text-slate-600">
                 Daftarkan usaha Anda dan mulai terima klien dari direktori ini secara gratis.
               </p>
-              <Link href="/daftar" className={buttonClasses("primary", "lg") + " mt-6"}>
+              <Link href="/register" className={buttonClasses("primary", "lg") + " mt-6"}>
                 Daftar Sekarang
               </Link>
             </div>

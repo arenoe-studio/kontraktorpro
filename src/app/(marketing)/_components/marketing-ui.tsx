@@ -135,17 +135,17 @@ export function MarketingNavbar({ minimal = false }: { minimal?: boolean }) {
 
         <div className="hidden items-center gap-3 md:flex">
           {!minimal ? (
-            <Link href="/masuk" className={buttonClasses("outline")}>
+            <Link href="/login" className={buttonClasses("outline")}>
               Masuk
             </Link>
           ) : null}
-          <Link href="/daftar" className={buttonClasses("primary")}>
+          <Link href="/register" className={buttonClasses("primary")}>
             Daftar Gratis
           </Link>
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
-          <Link href="/daftar" className={cn(buttonClasses("primary"), "px-4 text-sm")}>
+          <Link href="/register" className={cn(buttonClasses("primary"), "px-4 text-sm")}>
             Daftar Gratis
           </Link>
           {!minimal ? (
@@ -169,7 +169,7 @@ export function MarketingNavbar({ minimal = false }: { minimal?: boolean }) {
                 {item.label}
               </Link>
             ))}
-            <Link href="/masuk" className="rounded-lg px-2 py-2 hover:bg-slate-50">
+            <Link href="/login" className="rounded-lg px-2 py-2 hover:bg-slate-50">
               Masuk
             </Link>
           </nav>
@@ -307,7 +307,7 @@ export function PricingToggle({
                     </li>
                   ))}
                 </ul>
-                <Link href="/daftar" className={buttonClasses(plan.featured ? "primary" : "outline", "lg") + " w-full"}>
+                <Link href="/register" className={buttonClasses(plan.featured ? "primary" : "outline", "lg") + " w-full"}>
                   {plan.cta}
                 </Link>
                 {plan.note ? <p className="text-xs text-slate-500">{plan.note}</p> : null}

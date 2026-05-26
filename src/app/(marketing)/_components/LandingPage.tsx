@@ -249,7 +249,7 @@ export function LandingPage() {
                       <Star key={index} className="h-4 w-4 fill-orange-400 text-orange-400" />
                     ))}
                   </div>
-                  <p className="mt-4 text-sm leading-7 text-slate-600">"{testimonial.quote}"</p>
+                  <p className="mt-4 text-sm leading-7 text-slate-600">&ldquo;{testimonial.quote}&rdquo;</p>
                 </article>
               ))}
             </div>

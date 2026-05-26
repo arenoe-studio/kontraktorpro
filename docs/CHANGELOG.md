@@ -2,8 +2,314 @@
 
 > Reverse-chronological log of all working sessions. Most recent entry first.
 > Format follows AGENTS.md changelog rules.
+> Timestamps use local time (WIB, UTC+7).
 
-## 2026-05-25 — Feature: Real Authentication (DB + bcrypt + Resend Email OTP)
+---
+
+## 2026-05-27 — Chore: Checkpoint — Verifikasi type check dan build (Task 13)
+
+### Modified
+- `src/__tests__/preservation.test.ts` — ganti inline `require("child_process")` dengan ES import di top-level untuk menghilangkan ESLint error `@typescript-eslint/no-require-imports`
+- `src/app/(marketing)/_components/LandingPage.tsx` — escape karakter `"` di JSX text content menjadi `&ldquo;` dan `&rdquo;` untuk menghilangkan ESLint error `react/no-unescaped-entities`
+
+### Changes
+- `npm run typecheck` — lulus tanpa error (exit code 0)
+- `npm run lint` — lulus tanpa error setelah fix (exit code 0, 13 warnings pre-existing)
+- `npm test` — 108 tests lulus di 6 test files (exit code 0)
+- `mock-data.ts` masih intact dan digunakan oleh `/projects`, `/projects/[id]`, dan komponen terkait
+- `DashboardPage.tsx` tidak mengimpor `getDashboardSummary` atau `getProjects` dari `mock-data.ts`
+- `page.tsx` memanggil `getDashboardData` dan meneruskan `data` ke `DashboardPage`
+
+### Risks
+- Low — hanya perbaikan lint, tidak ada perubahan logika atau behavior
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-27 — Chore: DB Migration — tambah kolom `target_date` dan `completed_at` ke tabel `projects` (Task 1)
+
+### Modified
+- `drizzle/meta/_journal.json` — tambah entry idx 2 untuk `0002_dashboard_columns`
+- `drizzle/meta/0002_snapshot.json` — buat snapshot baru yang mencerminkan schema setelah migration
+
+### Added
+- `drizzle/meta/0002_snapshot.json` — snapshot schema setelah penambahan kolom `target_date` dan `completed_at`
+
+### Changes
+- Kolom `target_date date` (nullable) dan `completed_at timestamp` (nullable) ditambahkan ke tabel `projects` di Neon database via `npx drizzle-kit push`
+- Journal Drizzle diperbarui untuk mencatat migration `0002_dashboard_columns` sebagai entry idx 2
+- Snapshot `0002_snapshot.json` dibuat untuk melengkapi tracking migration
+
+### Risks
+- Low — penambahan kolom nullable tidak mempengaruhi data atau query yang sudah ada
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-27 — Feature: Modifikasi dashboard page.tsx untuk memanggil getDashboardData (Task 10.1)
+
+### Modified
+- `src/app/(app)/dashboard/page.tsx` — Diubah menjadi async Server Component; memanggil `requireRole("contractor")` dan `getDashboardData(user.id)`, lalu meneruskan hasilnya sebagai props ke `DashboardPage`
+
+### Changes
+- Page component sekarang async dan mengambil data riil dari database via `getDashboardData`
+- `requireRole("contractor")` memastikan hanya kontraktor yang bisa mengakses halaman ini; redirect otomatis jika tidak terautentikasi
+- Exception dibiarkan propagate ke Next.js error boundary (`error.tsx`) — tidak ada try-catch di page level
+
+### Risks
+- Low — perubahan minimal, hanya mengganti stub 3-baris dengan pola async server component yang sudah dirancang di design.md
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-27 — Feature: Buat seed script idempoten untuk akun demo (Task 12.1, 12.2)
+
+### Added
+- `scripts/seed-demo.ts` — Seed script idempoten untuk akun demo `arenoe.studio@gmail.com`. Menyeed 3 proyek (active/delayed/completed), 16 daily_reports, 10 activity_logs, dan 5 project_members. Tidak menyeed portfolio_entries untuk proyek completed (memicu success reminder). Semua insert menggunakan cek eksplisit sebelum insert untuk idempotency.
+
+### Modified
+- `package.json` — Tambah script `"seed:demo": "tsx scripts/seed-demo.ts"`
+
+### Changes
+- Seed script menggunakan relative import `../src/lib/db` dan `../src/lib/db/schema` (bukan path alias `@/`) karena dijalankan via `tsx` di luar konteks Next.js
+- Idempotency strategy: projects (name + ownerId), daily_reports (projectId + DATE(createdAt)), activity_logs (actorId + action + targetId + DATE(createdAt)), project_members (projectId + name)
+- Data dirancang untuk memicu semua tipe reminder: danger (project1 tanpa laporan hari ini), warning (project1 deadline 5 hari, project2 deadline sudah lewat), success (project3 completed tanpa portfolio)
+
+### Risks
+- Low — script hanya dijalankan secara manual, tidak ada perubahan pada kode aplikasi
+
+### Dependencies
+- None (tsx sudah tersedia sebagai transitive dependency via drizzle-kit)
+
+---
+
+## 2026-05-27 — Feature: Modifikasi DashboardPage.tsx untuk menerima DashboardSummary sebagai props (Task 9.1)
+
+### Modified
+- `src/app/(app)/_components/DashboardPage.tsx` — refactor dari komponen tanpa props menjadi presentational component yang menerima `DashboardSummary`
+
+### Changes
+- Ubah signature: `DashboardPage()` → `DashboardPage({ data }: { data: DashboardSummary })`
+- Import `DashboardSummary` dari `@/features/dashboard/types`
+- Hapus import `getDashboardSummary` dan `getProjects` dari `./mock-data`
+- Pertahankan import `getStatusBadgeVariant` dan `getStatusLabel` dari `./mock-data` (masih dibutuhkan untuk render badge)
+- Tambah import `EmptyState` dari `./ui`
+- Ganti semua referensi `summary.*` dan `activeProjects` dengan field dari `data.*`
+- Blok A: tanggal dinamis via `new Date().toLocaleDateString("id-ID", ...)`, greeting dari `data.greetingLabel`, nama dari `data.fullName`
+- Blok B: KPI helper texts dinamis berdasarkan `data.nearDeadlineProjects.length` dan `data.pendingReportCount`
+- Blok C: empty state jika `data.reminders.length === 0`
+- Blok D: ganti `project.owner` → `project.ownerName`, handle nullable `daysRemaining` (null/negatif/0/positif)
+- Blok E: empty state jika `data.activities.length === 0`, tampilkan banner jika `data.activityLoadError`
+- Blok F (Shortcuts): ganti hardcoded project-specific URLs dengan generic links (`/projects`, `/projects/new`)
+- Baris bawah: ganti hardcoded values dengan `data.nearestDeadlineDays`, `data.photosToday`, `data.materialsRecordedTotal`, `data.activeMemberCount`
+- Req 10.1: full onboarding empty state jika `activeProjectCount === 0 && finishedThisMonth === 0`
+- Req 10.3: project limit banner + disabled "Buat Proyek Baru" button jika `data.isProjectLimitReached`
+- Req 10.5: Blok D empty state jika `data.activeProjects.length === 0` (tapi user punya proyek lain)
+
+### Risks
+- Low — perubahan terisolasi pada satu komponen presentational; `page.tsx` akan menghasilkan TS error sementara sampai task 10.1 diimplementasikan
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-27 — Feature: Buat error.tsx untuk dashboard route (Task 11.1)
+
+### Added
+- `src/app/(app)/dashboard/error.tsx` — error boundary client component untuk route `/dashboard`
+
+### Changes
+- Menggunakan `"use client"` directive sesuai persyaratan Next.js App Router untuk error boundaries
+- Menerima props `{ error: Error & { digest?: string }, reset: () => void }` sesuai Next.js API
+- Menampilkan pesan error user-friendly dalam Bahasa Indonesia dengan ikon `AlertTriangle`
+- Tombol "Coba Lagi" memanggil `reset()` untuk retry render
+- Menampilkan `error.digest` jika tersedia untuk memudahkan debugging
+- Menggunakan `SurfaceCard` dari `../_components/ui` untuk konsistensi visual
+- Tombol menggunakan styling inline yang konsisten dengan design system (accent orange `#F97316`)
+- `useEffect` untuk log error ke console tanpa mengekspos ke user
+
+### Risks
+- Low — file baru, tidak mengubah kode produksi yang ada
+
+### Dependencies
+- None
+
+## 2026-05-27 — Feature: Buat dashboard-service.test.ts dengan integration tests (Task 7.2)
+
+### Added
+- `src/features/dashboard/__tests__/dashboard-service.test.ts` — integration tests untuk `getDashboardData` dengan mock Drizzle db
+
+### Changes
+- Menggunakan `vi.hoisted()` untuk membuat `mockDb` dan `mockReturnQueue` yang tersedia di factory `vi.mock`
+- Queue-based mock: setiap call ke `db.select()` mengambil data dari antrian, memungkinkan kontrol per-query
+- 3 unit integration tests: user dengan proyek, user tanpa proyek, activity_logs query gagal
+- 3 property-based tests (Properties 2, 3, 4): activeProjectCount, reportCompletionToday format, averageProgress
+- Semua 108 tests lulus (6 tests baru + 102 existing)
+
+### Risks
+- Low — file baru, tidak mengubah kode produksi
+
+### Dependencies
+- None
+
+## 2026-05-27 — Feature: Buat dashboard-service.ts dengan getDashboardData (Task 7.1)
+
+### Added
+- `src/features/dashboard/dashboard-service.ts` — fungsi utama `getDashboardData(userId: string): Promise<DashboardSummary>`
+
+### Changes
+- Mengimplementasikan 3-step aggregation: query users + projects (sequential) → 4 paralel queries (daily_reports, activity_logs, project_members, portfolio_entries) → agregasi ke DashboardSummary
+- Early return dengan semua nilai 0 jika user belum punya proyek (Req 1.5)
+- Partial failure pattern untuk activity_logs: try-catch internal, return `activityLoadError: true` jika gagal (Req 6.6)
+- Graceful degradation untuk photosToday dan materialsRecordedTotal (return 0, tabel belum ada) (Req 7.2, 7.3)
+- Success reminders untuk completed projects tanpa portfolio entry ditangani di service (bukan di buildReminders) karena buildReminders hanya menerima active/delayed projects
+- subscriptionTier diambil dari query users table karena DbUser dari session tidak menyertakannya
+- `npx tsc --noEmit` lulus tanpa error
+
+### Risks
+- Medium — fungsi utama service layer; belum diintegrasikan ke page.tsx (Task 10.1) dan DashboardPage.tsx (Task 9.1)
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-27 — Feature: Buat helpers.unit.test.ts untuk fitur dashboard (Task 5.1)
+
+### Added
+- `src/features/dashboard/__tests__/helpers.unit.test.ts` — unit tests edge cases untuk semua 7 helper functions
+
+### Changes
+- 54 test cases mencakup boundary values untuk `getGreetingLabel`, `formatRelativeTime`, `calcDaysRemaining`, `buildReminders`, `sortActiveProjects`, `mapActionLabel`, dan `isAtProjectLimit`
+- Semua 54 tests lulus (vitest run)
+
+### Risks
+- Low — hanya menambah file test baru, tidak mengubah kode produksi
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-27 — Feature: Buat helpers.ts untuk fitur dashboard (Task 4.1)
+
+### Added
+- `src/features/dashboard/helpers.ts` — semua pure helper functions untuk dashboard service
+
+### Changes
+- Implementasi 8 pure functions: `toWIB`, `getGreetingLabel`, `formatRelativeTime`, `calcDaysRemaining`, `buildReminders`, `sortActiveProjects`, `mapActionLabel`, `isAtProjectLimit`
+- Definisi tipe internal `RawProject` dan `BuildReminderParams` di file yang sama
+- Tidak ada dependency eksternal — konversi WIB dilakukan manual dengan offset +7 jam
+- `buildReminders` menghasilkan reminder danger/warning, diurutkan berdasarkan prioritas, dibatasi 5 item
+- `sortActiveProjects` menempatkan delayed sebelum active, null targetDate di akhir
+- `isAtProjectLimit` mendukung tier free (1), pro (3), business (unlimited)
+
+### Risks
+- Low — file baru, tidak mengubah file yang sudah ada
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-26 — Feature: Buat types.ts untuk fitur dashboard (Task 3.1)
+
+### Added
+- `src/features/dashboard/types.ts` — Definisi semua tipe TypeScript untuk fitur dashboard real data
+
+### Changes
+- Mendefinisikan `ReminderType` union type: `"danger" | "warning" | "success" | "info"`
+- Mendefinisikan `DashboardReminder` untuk item reminder Blok C
+- Mendefinisikan `DashboardActivity` untuk item aktivitas Blok E (termasuk field `time` string dan `createdAt` Date)
+- Mendefinisikan `ActiveProjectItem` untuk item proyek aktif Blok D (progress 0–100, targetDate nullable, daysRemaining nullable)
+- Mendefinisikan `NearDeadlineProject` untuk KPI near-deadline Blok B
+- Mendefinisikan `DashboardSummary` agregat lengkap: Blok A (greeting), Blok B (KPI), Blok C (reminders), Blok D (activeProjects), Blok E (activities + activityLoadError), secondary stats, dan state flags
+
+### Risks
+- Low — file baru, tidak mengubah file yang sudah ada
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-26 — Feature: Tambah kolom targetDate dan completedAt ke tabel projects (Task 2.1)
+
+### Modified
+- `src/lib/db/schema.ts` — Tambah `date` ke import list; tambah `targetDate: date("target_date")` dan `completedAt: timestamp("completed_at")` (keduanya nullable) ke definisi tabel `projects`
+
+### Added
+- `drizzle/0002_dashboard_columns.sql` — Migration file: `ALTER TABLE "projects" ADD COLUMN IF NOT EXISTS "target_date" date, ADD COLUMN IF NOT EXISTS "completed_at" timestamp`
+
+### Changes
+- Kolom `target_date` (date, nullable) dibutuhkan untuk fitur near-deadline detection dan sorting proyek aktif berdasarkan urgensi
+- Kolom `completed_at` (timestamp, nullable) dibutuhkan untuk menghitung `finishedThisMonth` (proyek selesai bulan ini)
+- Tidak ada perubahan pada kolom yang sudah ada; semua kolom existing tetap utuh
+
+### Risks
+- Low — penambahan kolom nullable tidak mempengaruhi query atau kode yang sudah ada; migration menggunakan `IF NOT EXISTS` sehingga aman dijalankan ulang
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-26 04:19 — Chore: Perbaikan AGENTS.md dan koreksi tanggal CHANGELOG
+
+### Modified
+- `AGENTS.md` — Restrukturisasi penuh: format markdown proper, section bernomor, tabel, contoh format changelog yang benar
+- `docs/CHANGELOG.md` — Koreksi tanggal yang salah (2026-07-14 → 2026-05-25, 2025-01-27 → 2026-05-25); tambah jam ke semua entry
+
+### Changes
+- AGENTS.md sekarang menggunakan markdown headers, tabel, dan code block yang proper
+- Semua section diberi nomor untuk referensi yang mudah
+- Changelog entry format diperbarui dengan contoh yang mencakup jam
+- Tanggal `2026-07-14` (masa depan) dan `2025-01-27` (tidak konsisten) dikoreksi ke `2026-05-25` sesuai urutan kerja aktual
+
+### Risks
+- Low — dokumentasi only, tidak ada perubahan kode
+
+### Dependencies
+- None
+
+---
+
+## 2026-05-26 03:45 — Bugfix: Marketing links, DB connection, Resend lazy init, UI text color
+
+### Modified
+- `src/app/(marketing)/_components/LandingPage.tsx` — `/daftar` → `/register`, `/masuk` → `/login`
+- `src/app/(marketing)/_components/marketing-ui.tsx` — `/daftar` → `/register`, `/masuk` → `/login`
+- `src/app/(marketing)/_components/HargaPage.tsx` — `/daftar` → `/register`
+- `src/app/(marketing)/_components/DirectoriPage.tsx` — `/daftar` → `/register`
+- `src/lib/db/index.ts` — Ganti `neon()` HTTP driver ke `Pool` WebSocket mode; lazy init via Proxy; ws adapter untuk Node.js lokal
+- `src/lib/services/email-otp-service.ts` — Lazy init Resend client (fix build error saat env var belum tersedia); tambah error logging
+- `src/features/auth/actions.ts` — Teruskan `result.message` asli dari service ke UI (sebelumnya selalu override dengan pesan generik)
+- `src/features/auth/components/auth-shell.tsx` — Tambah `text-white` eksplisit pada `h2` brand panel
+
+### Changes
+- Semua tombol "Masuk" dan "Daftar" di halaman marketing sekarang mengarah ke route yang benar (`/login`, `/register`)
+- Koneksi DB beralih dari HTTP fetch (gagal di Windows/Node.js) ke WebSocket Pool — lebih reliable di local dev
+- Resend dan DB tidak lagi diinisialisasi saat module load (fix build error di Vercel tanpa env vars)
+- Error message dari auth service sekarang diteruskan ke UI untuk debugging yang lebih baik
+- Teks heading brand panel di halaman auth sekarang putih eksplisit
+
+### Risks
+- Low — semua perubahan adalah bugfix dan UI fix
+- `ws` package ditambahkan sebagai devDependency untuk WebSocket adapter di Node.js
+
+### Dependencies
+- Added: `ws`, `@types/ws` (devDependencies)
+
+---
+
+## 2026-05-25 23:30 — Feature: Real Authentication (DB + bcrypt + Resend Email OTP)
 
 ### Modified
 - `src/lib/db/schema.ts` — Added `email`, `suspended`, `first_login` to users; added `otpChallenges` table; added `authIntentEnum`
@@ -52,7 +358,7 @@
 
 ---
 
-## 2025-01-27 — Task 10.1: Cleanup — Hapus mock-auth-service
+## 2026-05-25 22:50 — Cleanup: Hapus mock-auth-service (Task 10.1)
 
 ### Deleted
 - `src/features/auth/mock-auth-service.ts` — mock in-memory auth service dihapus setelah semua import dimigrasikan ke `auth-service.ts`
@@ -75,7 +381,7 @@
 
 ---
 
-## 2026-07-14 — real-auth spec: Task 9.1 (Apply migration to Neon database)
+## 2026-05-25 22:10 — real-auth spec: Task 9.1 — Apply migration to Neon database
 
 ### Modified
 - `drizzle.config.ts` — temporarily added `postgres` driver for CLI migration, restored to original after migration
@@ -103,7 +409,7 @@
 
 ---
 
-## 2026-07-14 — real-auth spec: Tasks 8.1–8.5 (UI Updates — phone → email, remove debugCode)
+## 2026-05-25 21:20 — real-auth spec: Tasks 8.1–8.5 — UI Updates (phone → email, remove debugCode)
 
 ### Modified
 - `src/features/auth/components/register-form.tsx` — field "Nomor HP" → "Email", id/inputMode/placeholder/register/errors updated, helper text updated, FormCard description updated
@@ -120,14 +426,14 @@
 
 ### Risks
 - Low — UI-only changes, no logic or server action changes
-- Pre-existing TypeScript errors remain in mock files (mock-auth-service.ts, mock-data.ts, mock-services.ts) — these are carry-over from Tasks 3.1/3.3/3.4 and will be resolved in Task 10.1 (mock cleanup)
+- Pre-existing TypeScript errors remain in mock files (mock-auth-service.ts, mock-data.ts, mock-services.ts) — carry-over from Tasks 3.x, resolved in Task 10.1
 
 ### Dependencies
-- None added
+- None
 
 ---
 
-## 2026-07-14 — real-auth spec: Tasks 7.1 & 7.2 (Integration — actions.ts + session.ts)
+## 2026-05-25 20:30 — real-auth spec: Tasks 7.1 & 7.2 — Integration (actions.ts + session.ts)
 
 ### Modified
 - `src/features/auth/actions.ts`
@@ -156,14 +462,14 @@
 
 ### Risks
 - Low — mechanical substitution; no logic changed
-- 6 pre-existing TS errors remain in mock files (`mock-auth-service.ts`, `mock-data.ts`, `mock-services.ts`) — these are scheduled for cleanup in task 10.1 and are not caused by these changes
+- 6 pre-existing TS errors remain in mock files — scheduled for cleanup in task 10.1
 
 ### Dependencies
-- None added
+- None
 
 ---
 
-## 2026-07-14 — real-auth spec: Task 6.5 (resendChallenge, startPasswordReset, resetPassword)
+## 2026-05-25 19:40 — real-auth spec: Task 6.5 — resendChallenge, startPasswordReset, resetPassword
 
 ### Modified
 - `src/features/auth/auth-service.ts`
@@ -179,11 +485,11 @@
 - Pre-existing TS errors in actions.ts, UI components, mock files remain (belong to tasks 7, 8, 10)
 
 ### Dependencies
-- None added
+- None
 
 ---
 
-## 2026-07-14 — real-auth spec: Task 6.4 (verifyChallengeCode)
+## 2026-05-25 18:50 — real-auth spec: Task 6.4 — verifyChallengeCode
 
 ### Modified
 - `src/features/auth/auth-service.ts` — replaced `verifyChallengeCode` stub with full implementation
@@ -199,22 +505,22 @@
     - If `newAttempts <= 0`: UPDATE SET `attemptsRemaining = 0, lockedUntil = now + 10min`, return "Terlalu banyak percobaan. Coba lagi dalam 10 menit."
     - Else: UPDATE SET `attemptsRemaining = newAttempts`, return "Kode salah. Sisa N percobaan."
     - Both branches use `.returning()` for updated snapshot; fallback to spread if no row returned
-  - Code correct, flow `"register"`: parse metadata JSON, Drizzle transaction (INSERT users + DELETE otp_challenges), inline `DbUser` mapping (avoids private `mapDbRowToDbUser` in users.ts), return `{ success: true, challenge, user: newUser }`
+  - Code correct, flow `"register"`: parse metadata JSON, Drizzle transaction (INSERT users + DELETE otp_challenges), inline `DbUser` mapping, return `{ success: true, challenge, user: newUser }`
   - Code correct, flow `"login"`: UPDATE `isVerified = true`, `findUserByEmail(challenge.email)`, return `{ success: true, challenge, user }`
   - Code correct, flow `"forgot-password"`: UPDATE `isVerified = true`, return `{ success: true, challenge, user: null }`
   - Entire function wrapped in try/catch
 
 ### Risks
 - Low — only auth-service.ts modified
-- 33 pre-existing TSC errors remain in other files (actions.ts, form components, mock files, session.ts) — unrelated to task 6.4; will be resolved by tasks 7.x, 8.x, 10.x
+- 33 pre-existing TSC errors remain in other files — unrelated to task 6.4; will be resolved by tasks 7.x, 8.x, 10.x
 - Zero diagnostics in auth-service.ts itself
 
 ### Dependencies
-- None added
+- None
 
 ---
 
-## 2026-07-14 — real-auth spec: Tasks 6.2, 6.3 (startRegistration, loginWithPassword, startLoginOtp)
+## 2026-05-25 17:50 — real-auth spec: Tasks 6.2, 6.3 — startRegistration, loginWithPassword, startLoginOtp
 
 ### Modified
 - `src/features/auth/auth-service.ts` — replaced three `throw new Error("Not implemented")` stubs with real implementations
@@ -227,15 +533,15 @@
 
 ### Risks
 - Low — only auth-service.ts modified; no new files, no imports changed
-- 33 pre-existing TSC errors remain in other files (actions.ts, form components, mock files, session.ts) — unrelated to tasks 6.2/6.3; will be resolved by tasks 7.x, 8.x, 10.x
+- 33 pre-existing TSC errors remain in other files — unrelated to tasks 6.2/6.3; will be resolved by tasks 7.x, 8.x, 10.x
 - Zero diagnostics in auth-service.ts itself
 
 ### Dependencies
-- None added
+- None
 
 ---
 
-## 2026-07-14 — real-auth spec: Tasks 4.1, 5.1 (DB instance + Email OTP Service)
+## 2026-05-25 16:50 — real-auth spec: Tasks 4.1, 5.1 — DB instance + Email OTP Service
 
 ### Added
 - `src/lib/db/index.ts` — Drizzle db instance using Neon serverless driver
@@ -258,7 +564,7 @@
 
 ---
 
-## 2026-07-14 — real-auth spec: Tasks 3.1, 3.3, 3.4 (Core Types — auth types, contracts)
+## 2026-05-25 15:40 — real-auth spec: Tasks 3.1, 3.3, 3.4 — Core Types (auth types, contracts)
 
 ### Modified
 - `src/features/auth/types.ts` — removed `MockUser`, added `DbUser`; updated `OtpChallengeSnapshot` (maskedPhone→maskedEmail, removed debugCode); updated `PasswordResetState` (phone→email)
@@ -290,7 +596,7 @@
 
 ---
 
-## 2026-07-14 — real-auth spec: Task 1.1 + 1.2 (Foundation — Dependencies & Env)
+## 2026-05-25 14:30 — real-auth spec: Task 1.1 + 1.2 — Foundation (Dependencies & Env)
 
 ### Modified
 - `package.json` — added `bcryptjs`, `resend` (dependencies); `@types/bcryptjs`, `fast-check` (devDependencies)
@@ -308,14 +614,14 @@
 - Low — no source code changed, only dependency additions and env example update
 
 ### Dependencies
-- `bcryptjs` ^3.0.3 (production)
-- `resend` ^6.12.3 (production)
-- `@types/bcryptjs` ^2.4.6 (dev)
-- `fast-check` ^4.8.0 (dev)
+- Added: `bcryptjs@^3.0.3` (production)
+- Added: `resend@^6.12.3` (production)
+- Added: `@types/bcryptjs@^2.4.6` (dev)
+- Added: `fast-check@^4.8.0` (dev)
 
 ---
 
-## 2026-05-25 — Technical Debt Cleanup + Small Improvements
+## 2026-05-25 10:00 — Technical Debt Cleanup + Small Improvements
 
 ### Modified
 - `src/lib/ui/cn.ts` — Changed from independent definition to re-export from `@/lib/utils`

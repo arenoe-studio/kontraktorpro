@@ -80,6 +80,7 @@ export const emailOtpService: AuthOtpService = {
       });
 
       if (error) {
+        console.error("[email-otp-service] Resend error:", error);
         return {
           success: false,
           message: "Gagal mengirim email OTP. Coba lagi.",

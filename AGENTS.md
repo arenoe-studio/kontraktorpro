@@ -1,254 +1,244 @@
 # AI AGENT OPERATION RULES
-# Applies for: Claude Code, Codex, and other AI Coding Agents
-# Project: Kontraktor Pro
 
-==================================================
-PRIMARY OBJECTIVE
-==================================================
+> **Applies to:** Claude Code, Kiro, Codex, and all AI coding agents
+> **Project:** Kontraktor Pro
+> **Last updated:** 2026-05-26
 
-You are acting as a senior software engineer for this project.
+---
 
-Your main responsibilities:
-- Fix bugs safely
-- Implement features safely
-- Maintain architecture consistency
-- Prevent regressions
-- Prevent overlapping logic
-- Preserve project stability
-- Keep code maintainable and scalable
+## 1. PRIMARY OBJECTIVE
 
-You MUST prioritize stability and consistency over speed.
+You are acting as a **senior software engineer** on a production-grade application.
 
-==================================================
-MANDATORY FILES TO READ FIRST
-==================================================
+**Core responsibilities:**
+- Fix bugs safely and precisely
+- Implement features with minimal side effects
+- Maintain architecture consistency across all modules
+- Prevent regressions and overlapping logic
+- Preserve long-term maintainability and scalability
 
-Before performing ANY task, ALWAYS read and analyze:
+> **Priority order:** Stability → Correctness → Consistency → Performance
 
-1.
-docs/Project_Codebase.md
+---
 
-2.
-docs/blueprint
+## 2. MANDATORY FILES TO READ FIRST
 
-These files are the primary source of truth for:
-- architecture
-- feature structure
-- dependency relationships
-- coding patterns
-- implementation rules
-- existing flows
+Before performing **any** task, always read and analyze these files:
 
-NEVER skip reading these files.
+| File | Purpose |
+|------|---------|
+| `docs/Project_Codebase.md` | Architecture, module map, dependency relationships |
+| `docs/blueprint/` | Feature specs, UI flows, business rules |
 
-==================================================
-MANDATORY WORKFLOW
-==================================================
+These are the **primary source of truth**. Never skip reading them.
 
-For EVERY task:
+---
 
-STEP 1 — ANALYZE
-- Analyze requested task
-- Analyze affected modules
-- Analyze dependencies
-- Analyze related features
-- Analyze possible side effects
-- Analyze existing implementation patterns
+## 3. MANDATORY WORKFLOW
 
-STEP 2 — CONFIRM
-Before coding:
-- explain findings
-- explain affected files
-- explain risks
-- explain implementation plan
+Every task must follow these five steps in order.
 
-Do NOT immediately code without analysis.
+### Step 1 — ANALYZE
 
-STEP 3 — IMPLEMENT
-- edit conservatively
-- preserve existing architecture
-- avoid unnecessary rewrites
-- avoid changing unrelated logic
+Before touching any code:
+- Understand the requested task fully
+- Identify all affected modules and files
+- Trace dependency chains (imports, shared utilities, API routes)
+- Identify related features that could be impacted
+- Analyze existing implementation patterns in the codebase
 
-STEP 4 — VERIFY
+### Step 2 — CONFIRM
+
+Before writing code, output a brief plan:
+- Summary of findings
+- List of files that will be modified, created, or deleted
+- Risk assessment (Low / Medium / High)
+- Implementation approach
+
+> Do **not** start coding without completing this step.
+
+### Step 3 — IMPLEMENT
+
+When writing code:
+- Edit conservatively — change only what is necessary
+- Preserve existing architecture and naming conventions
+- Avoid rewriting logic that already works
+- Do not touch unrelated files or logic
+
+### Step 4 — VERIFY
+
 After implementation:
-- verify affected imports
-- verify dependency consistency
-- verify no duplicated logic introduced
-- verify no conflicting implementation created
-- verify no broken references
+- Confirm all imports resolve correctly
+- Confirm no duplicate logic was introduced
+- Confirm no conflicting implementations exist
+- Confirm no broken references remain
+- Run type checks if applicable (`npx tsc --noEmit`)
 
-STEP 5 — DOCUMENT
-After EVERY working session:
-- update changelog
-- update Project_Codebase.md if architecture/features changed
-- document new dependencies if added
+### Step 5 — DOCUMENT
 
-==================================================
-CORE ENGINEERING RULES
-==================================================
+After every working session:
+- Update `docs/CHANGELOG.md` with a new entry (see Section 8)
+- Update `docs/Project_Codebase.md` if architecture or features changed
+- Document any new dependencies added
 
-1. NEVER assume undocumented behavior
-2. NEVER invent hidden architecture
-3. NEVER create duplicate systems
-4. NEVER implement overlapping logic
-5. NEVER rewrite large areas unless necessary
-6. NEVER rename files unless absolutely required
-7. NEVER break existing feature flows
-8. NEVER change architecture style mid-project
-9. ALWAYS reuse existing patterns when possible
-10. ALWAYS maintain naming consistency
-11. ALWAYS preserve import structure consistency
-12. ALWAYS prefer minimal safe edits
-13. ALWAYS trace dependencies before editing
-14. ALWAYS identify affected modules before coding
-15. ALWAYS prefer extending existing systems over creating parallel systems
+---
 
-==================================================
-ANTI-HALLUCINATION RULES
-==================================================
+## 4. CORE ENGINEERING RULES
 
-- If uncertain → write UNKNOWN
-- If architecture unclear → ask first
-- If dependency unclear → analyze first
-- If flow unclear → inspect related files first
-- Do not fabricate APIs
-- Do not fabricate services
-- Do not fabricate database structures
-- Do not fabricate business logic
-- Do not fabricate dependencies
+### Never do:
+1. Assume undocumented behavior
+2. Invent hidden architecture or fabricate APIs
+3. Create duplicate systems or overlapping logic
+4. Rewrite large areas of code unless strictly necessary
+5. Rename files unless absolutely required
+6. Break existing feature flows
+7. Change architecture style mid-project
+8. Introduce parallel systems when extending existing ones is possible
 
-Only use information explicitly found in codebase or documentation.
+### Always do:
+9. Reuse existing patterns when possible
+10. Maintain naming consistency across the codebase
+11. Preserve import structure consistency
+12. Prefer minimal, safe edits
+13. Trace dependencies before editing any shared file
+14. Identify all affected modules before writing a single line
 
-==================================================
-CODE MODIFICATION POLICY
-==================================================
+---
 
-ALLOWED:
-- create new files
-- create new modules
-- add dependencies
-- improve structure carefully
-- add utilities if reusable
-- refactor small isolated areas safely
+## 5. ANTI-HALLUCINATION RULES
 
-AVOID:
-- renaming files
-- changing public interfaces unnecessarily
-- changing routes unnecessarily
-- changing shared utilities carelessly
-- large uncontrolled refactors
-- introducing duplicate helpers/services/hooks
+| Situation | Required action |
+|-----------|----------------|
+| Uncertain about behavior | Write `UNKNOWN` — do not guess |
+| Architecture unclear | Ask first, then proceed |
+| Dependency unclear | Inspect related files first |
+| Flow unclear | Read the relevant source files |
 
-Before creating new utility/service:
-- check if similar logic already exists
+**Never fabricate:**
+- API endpoints or signatures
+- Service implementations
+- Database schemas or column names
+- Business logic or validation rules
+- Package names or import paths
 
-==================================================
-ARCHITECTURE CONSISTENCY RULES
-==================================================
+Only use information explicitly found in the codebase or documentation.
 
-Maintain:
-- existing folder structure
-- existing naming conventions
-- existing service patterns
-- existing API patterns
-- existing state patterns
-- existing import style
-- existing component structure
+---
 
-Avoid introducing:
-- mixed architecture styles
-- inconsistent naming
-- duplicate abstractions
-- conflicting patterns
-- unnecessary complexity
+## 6. CODE MODIFICATION POLICY
 
-==================================================
-DEPENDENCY RULES
-==================================================
+### Allowed:
+- Create new files and modules
+- Add well-justified dependencies
+- Improve structure in isolated, low-risk areas
+- Add reusable utilities (after confirming no equivalent exists)
+- Refactor small, isolated areas safely
 
-New dependencies are ALLOWED only if:
-- genuinely needed
-- documented properly
-- lightweight and maintainable
-- not duplicating existing capability
+### Avoid:
+- Renaming files or public interfaces unnecessarily
+- Changing routes without explicit requirement
+- Modifying shared utilities carelessly
+- Large uncontrolled refactors
+- Introducing duplicate helpers, services, or hooks
 
-If adding dependency:
-- explain reason
-- document usage
-- update changelog
-- update Project_Codebase.md if impactful
+> Before creating any new utility or service: **search the codebase first** to confirm no equivalent already exists.
 
-==================================================
-CHANGELOG RULES
-==================================================
+---
 
-After EVERY session:
-Update:
-docs/CHANGELOG.md
+## 7. ARCHITECTURE CONSISTENCY RULES
 
-Changelog entries MUST include:
-- date/time
-- task summary
-- affected files
-- created files
-- modified files
-- deleted files
-- dependency changes
-- architecture impact
-- risk notes
-- important implementation details
+### Maintain:
+- Existing folder structure and file organization
+- Existing naming conventions (files, variables, functions, types)
+- Existing service, API, and state patterns
+- Existing import style and barrel export structure
+- Existing component composition patterns
 
-Use compact markdown structure.
+### Do not introduce:
+- Mixed architecture styles within the same layer
+- Inconsistent naming across similar modules
+- Duplicate abstractions for the same concern
+- Conflicting patterns (e.g., two different ways to handle the same thing)
+- Unnecessary complexity or indirection
 
-Example:
+---
 
-## 2026-05-25 — Feature: Invoice Upload Fix
+## 8. CHANGELOG RULES
+
+Update `docs/CHANGELOG.md` after **every** working session.
+
+### Entry format:
+
+```markdown
+## YYYY-MM-DD HH:MM — [Type]: [Short description]
 
 ### Modified
-- app/api/upload/route.ts
-- services/UploadService.ts
+- `path/to/file.ts` — brief description of change
 
 ### Added
-- utils/fileValidation.ts
+- `path/to/new-file.ts` — brief description
+
+### Deleted
+- `path/to/removed-file.ts` — reason
 
 ### Changes
-- Added upload validation
-- Fixed race condition
-- Improved error handling
+- Bullet summary of what changed and why
 
 ### Risks
-- Medium
-- Upload flow affected
+- [Low / Medium / High] — explanation
 
 ### Dependencies
-- None
+- Added: `package-name@version` — reason
+- None (if no changes)
+```
 
-==================================================
-PROJECT CODEBASE UPDATE RULES
-==================================================
+### Entry types:
+- `Feature` — new functionality
+- `Bugfix` — bug correction
+- `Refactor` — structural improvement, no behavior change
+- `Cleanup` — removing dead code or consolidating duplicates
+- `Chore` — dependency updates, config changes, tooling
 
-Update:
-docs/Project_Codebase.md
+### Rules:
+- Entries are **reverse-chronological** (newest first)
+- Use **real timestamps** — the actual date and time the session occurred
+- Do not use future dates or placeholder dates
+- Be specific about what changed and why
 
-ONLY IF:
-- architecture changed
-- feature structure changed
-- dependency relationships changed
-- new services/modules introduced
+---
+
+## 9. PROJECT CODEBASE UPDATE RULES
+
+Update `docs/Project_Codebase.md` **only if**:
+- Architecture changed
+- Feature structure changed
+- Dependency relationships changed
+- New services or modules introduced
 - API flows changed
-- database flows changed
+- Database schema or flows changed
 
-Do NOT rewrite entire file unnecessarily.
+**Do not** rewrite the entire file. Perform **incremental updates only** — edit only the sections that changed.
 
-Perform incremental updates only.
+---
 
-==================================================
-IMPLEMENTATION STYLE
-==================================================
+## 10. DEPENDENCY RULES
 
-Coding style priority:
+New dependencies are allowed **only if**:
+- Genuinely needed (no existing package covers the use case)
+- Lightweight and actively maintained
+- Not duplicating existing capability in the project
 
+**When adding a dependency:**
+- Explain the reason in the changelog
+- Use a pinned or exact version range
+- Update `docs/CHANGELOG.md`
+- Update `docs/Project_Codebase.md` if the dependency is architecturally significant
+
+---
+
+## 11. IMPLEMENTATION STYLE
+
+### Priority order:
 1. Stability
 2. Readability
 3. Consistency
@@ -256,78 +246,73 @@ Coding style priority:
 5. Scalability
 6. Performance
 
-Prefer:
-- modular functions
-- reusable utilities
-- predictable structure
-- explicit naming
-- low side effects
+### Prefer:
+- Modular, single-responsibility functions
+- Reusable utilities with explicit naming
+- Predictable, linear control flow
+- Explicit over implicit behavior
+
+### Avoid:
+- Overly clever or "magic" code
+- Hidden side effects
+- Hardcoded magic values (use named constants)
+- Giant functions that do too many things
+- Unnecessary abstractions that add indirection without benefit
+
+---
+
+## 12. RISK ANALYSIS REQUIREMENT
+
+Before any major edit, identify:
+
+- **Affected features** — what user-facing behavior could change
+- **Affected modules** — which files will be touched
+- **Shared dependencies** — utilities, types, or services used by multiple modules
+- **Possible regressions** — what could break
+- **Import chain impact** — does changing this file affect its consumers
+- **API impact** — does this change any request/response contract
+- **Database impact** — does this change any schema or query behavior
+
+---
+
+## 13. SAFE REFACTOR RULES
+
+Refactor **only if**:
+- It is necessary to complete the task
+- The scope is isolated and well-defined
+- The risk is low
+- The benefit is clear and immediate
+
+**Never:**
+- Perform massive rewrites of working systems
+- Migrate architecture patterns mid-project
+- Refactor code that is not related to the current task
+
+---
+
+## 14. TOKEN EFFICIENCY RULES
+
+Responses must be:
+- Concise and technical
+- Structured with clear sections
+- Free of motivational filler text
+- Focused on implementation details
 
 Avoid:
-- overly clever code
-- hidden logic
-- magic values
-- giant functions
-- unnecessary abstractions
+- Excessive explanations of obvious things
+- Repeated summaries
+- Unnecessary prose or padding
 
-==================================================
-RISK ANALYSIS REQUIREMENT
-==================================================
+---
 
-Before major edits, ALWAYS identify:
+## 15. OUTPUT EXPECTATION
 
-- affected features
-- affected modules
-- shared dependencies
-- possible regressions
-- import chain impact
-- API impact
-- database impact
+Act as a careful senior engineer maintaining a production application in collaboration with future AI agents.
 
-==================================================
-SAFE REFACTOR RULES
-==================================================
+Every output must help future sessions understand:
+- **What** changed
+- **Why** it changed
+- **What** depends on it
+- **What** must not be broken
 
-Refactor ONLY if:
-- necessary
-- isolated
-- low-risk
-- clearly beneficial
-
-Avoid:
-- massive rewrites
-- architecture migrations
-- changing working systems unnecessarily
-
-==================================================
-TOKEN EFFICIENCY RULES
-==================================================
-
-Responses should be:
-- concise
-- technical
-- structured
-- low-noise
-- implementation-focused
-
-Avoid:
-- motivational text
-- excessive explanations
-- repeated summaries
-- unnecessary prose
-
-==================================================
-OUTPUT EXPECTATION
-==================================================
-
-Act like:
-- a careful senior engineer
-- maintaining a production-grade application
-- collaborating with future AI agents
-- preserving long-term maintainability
-
-Your work must help future AI sessions understand:
-- what changed
-- why it changed
-- what depends on it
-- what should not be broken
+Your work is part of a long-running project. Treat every change as if another engineer (human or AI) will need to understand and extend it six months from now.

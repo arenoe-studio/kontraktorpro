@@ -347,7 +347,7 @@ CheckoutPage → [PLANNED] PaymentGatewayService.startCheckout()
 | `src/lib/auth/session.ts` | All protected layouts | Session read/guard functions |
 | `src/lib/navigation.ts` | Layout components | Nav link arrays per role |
 | `src/lib/site.ts` | Root layout, sitemap | Site config + default metadata |
-| `src/lib/db/index.ts` | `auth-service.ts`, `users.ts` | Drizzle db instance (Neon HTTP driver) |
+| `src/lib/db/index.ts` | `auth-service.ts`, `users.ts` | Drizzle db instance — Pool WebSocket mode (Neon). Lazy-initialized via Proxy. Uses `ws` adapter in Node.js, native WebSocket on Vercel. |
 | `src/lib/db/queries/users.ts` | `auth-service.ts` | User DB query helpers (findByEmail, findById, createUser, updatePassword) |
 | `src/lib/services/email-otp-service.ts` | `auth-service.ts` | Resend email OTP implementation |
 
@@ -414,7 +414,7 @@ CheckoutPage → [PLANNED] PaymentGatewayService.startCheckout()
 |---|---|---|
 | `src/lib/auth/session.ts` | CRITICAL | Session cookie name `kp-auth-session` is hardcoded. `secure: true` on all cookies — requires HTTPS in production (local dev may need adjustment). |
 | `src/features/auth/actions.ts` | CRITICAL | All auth mutations. Cookie lifetimes: session = 30 days, OTP = 15 min, reset = 15 min. |
-| `src/features/auth/auth-service.ts` | CRITICAL | Real DB auth service. Passwords hashed with bcryptjs cost 12. OTP codes hashed with bcryptjs cost 10. No plaintext secrets stored or returned. |
+| `src/features/auth/auth-service.ts` | CRITICAL | Real DB auth service. Passwords hashed dengan bcryptjs cost 12. OTP codes hashed dengan bcryptjs cost 10. Tidak ada plaintext secrets yang disimpan atau dikembalikan. Resend client lazy-initialized. |
 | `src/lib/db/schema.ts` | HIGH | Schema is live — changes require Drizzle migrations applied to Neon. |
 | `src/app/admin/layout.tsx` | HIGH | RBAC guard for admin. Only `requireRole(["moderator", "super_admin"])` — do not weaken. |
 | `src/app/(app)/layout.tsx` | HIGH | RBAC guard for contractor app. Only `requireRole("contractor")`. |

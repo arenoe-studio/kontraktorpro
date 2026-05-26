@@ -1,5 +1,6 @@
 import {
   boolean,
+  date,
   integer,
   pgEnum,
   pgTable,
@@ -85,6 +86,8 @@ export const projects = pgTable("projects", {
   isOwnerTrackingEnabled: boolean("is_owner_tracking_enabled")
     .default(false)
     .notNull(),
+  targetDate: date("target_date"),
+  completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

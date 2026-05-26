@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seed:demo": "tsx scripts/seed-demo.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

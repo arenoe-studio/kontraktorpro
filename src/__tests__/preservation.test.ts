@@ -23,6 +23,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { execSync } from "child_process";
 import { describe, it, expect } from "vitest";
 import {
   getProjects,
@@ -235,8 +236,6 @@ describe("Preservation 4 — cn import resolution from @/lib/ui/cn", () => {
 // ---------------------------------------------------------------------------
 describe("Preservation 5 — TypeScript compilation baseline", () => {
   it("tsc --noEmit passes without errors on current codebase", () => {
-    const { execSync } = require("child_process");
-
     let tscOutput = "";
     let tscExitCode = 0;
 

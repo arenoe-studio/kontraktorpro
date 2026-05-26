@@ -67,7 +67,7 @@ export function AuthShell({
               </Link>
 
               <div className="space-y-6">
-                <h2 className="max-w-md text-4xl font-bold leading-tight">
+                <h2 className="max-w-md text-4xl font-bold leading-tight text-white">
                   Mulai kelola proyek lebih profesional hari ini.
                 </h2>
                 <ul className="space-y-4">

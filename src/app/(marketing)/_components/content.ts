@@ -97,6 +97,7 @@ export type OwnerTrackingRecord = {
 };
 
 export const navigationLinks = [
+  { href: "/direktori", label: "Direktori" },
   { href: "/#fitur", label: "Fitur" },
   { href: "/harga", label: "Harga" },
   { href: "/#tentang", label: "Tentang" },

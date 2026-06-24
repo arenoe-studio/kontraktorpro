@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-24 10:07 — Feature: Implementasi Integrasi Upload Foto (UploadThing)
+
+### Added
+- `src/app/api/uploadthing/core.ts` — Core router UploadThing untuk konfigurasi endpoint upload.
+- `src/app/api/uploadthing/route.ts` — Route handler API UploadThing untuk integrasi Next.js App Router.
+- `src/lib/uploadthing.ts` — Ekspor komponen UI dari `@uploadthing/react`.
+
+### Modified
+- `src/app/(app)/_components/photo-form-modal.tsx` — Mengganti input manual URL teks dengan komponen `UploadDropzone` dan menambahkan pratinjau gambar asli.
+- `src/app/layout.tsx` — Menambahkan import global CSS `@uploadthing/react/styles.css`.
+- `package.json` — Menambahkan dependensi `@uploadthing/react`.
+
+### Changes
+- Fitur unggah foto dokumentasi tidak lagi menggunakan input manual *mock* berbasis teks.
+- Pengguna dapat langsung men-drag-and-drop atau menelusuri gambar, file akan diunggah melalui API UploadThing.
+- Hanya pengguna yang terautentikasi (memiliki sesi login) yang diizinkan untuk mengunggah berkas.
+- Komponen menggunakan utilitas `toast` (`sonner`) untuk memberikan umpan balik (feedback) proses unggah berhasil atau gagal.
+
+### Risks
+- Low — Modifikasi aman secara infrastruktur, tetapi mengharuskan pengguna menambahkan variabel environment `UPLOADTHING_TOKEN` yang valid di sisi lokal/produksi.
+
+### Dependencies
+- Added: `@uploadthing/react` — Pustaka komponen react untuk integrasi unggahan.
+
+---
+
 ## 2026-06-24 09:35 — Feature: Implementasi Ekspor Laporan PDF
 
 ### Added

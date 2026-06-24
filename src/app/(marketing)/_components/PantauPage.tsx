@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getOwnerTrackingByToken } from "./content";
+import { getOwnerTrackingData } from "@/features/marketing/tracking-service";
 import { Badge, Container, MinimalFooter, Section } from "./marketing-ui";
 
 type Params = Promise<{ token: string }>;
@@ -30,7 +30,13 @@ export async function PantauPage({
   params: Params;
 }) {
   const { token } = await params;
-  const record = getOwnerTrackingByToken(token);
+  
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token);
+  if (!isUuid) {
+    notFound();
+  }
+
+  const record = await getOwnerTrackingData(token);
 
   if (!record) {
     notFound();
@@ -135,7 +141,10 @@ export async function PantauPage({
                     <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                       {record.photos.map((photo) => (
                         <article key={`${photo.label}-${photo.date}`} className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-50">
-                          <div className="flex min-h-44 items-end bg-gradient-to-br from-slate-200 to-white p-4">
+                          <div
+                            className="flex min-h-44 items-end bg-gradient-to-br from-slate-200 to-white p-4 bg-cover bg-center"
+                            style={photo.url ? { backgroundImage: `url(${photo.url})` } : undefined}
+                          >
                             <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700">Watermark {record.contractorBusiness}</span>
                           </div>
                           <div className="p-5">

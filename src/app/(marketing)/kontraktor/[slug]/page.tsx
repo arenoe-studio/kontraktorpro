@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { contractors, getContractorBySlug } from "../../_components/content";
+import { getPublicContractorBySlug } from "@/features/marketing/marketing-service";
 import { KontraktorProfilePage } from "../../_components/KontraktorProfilePage";
 
 type Params = Promise<{ slug: string }>;
-
-export async function generateStaticParams() {
-  return contractors.map((contractor) => ({ slug: contractor.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -14,7 +10,7 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const contractor = getContractorBySlug(slug);
+  const contractor = await getPublicContractorBySlug(slug);
   if (!contractor) {
     return { title: "Profil kontraktor tidak ditemukan" };
   }

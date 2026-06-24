@@ -14,6 +14,12 @@ export const moderationStatuses = [
   "rejected",
 ] as const;
 export const teamRoles = ["mandor", "pekerja", "spesialis"] as const;
+export const wbsStatuses = [
+  "Belum Dimulai",
+  "Dalam Pengerjaan",
+  "Tertunda",
+  "Selesai",
+] as const;
 
 export type Role = (typeof roles)[number];
 export type SubscriptionTier = (typeof subscriptionTiers)[number];
@@ -21,3 +27,4 @@ export type ProjectStatus = (typeof projectStatuses)[number];
 export type ReportStatus = (typeof reportStatuses)[number];
 export type ModerationStatus = (typeof moderationStatuses)[number];
 export type TeamRole = (typeof teamRoles)[number];
+export type WbsStatus = (typeof wbsStatuses)[number];

@@ -13,6 +13,15 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
+import { WbsFormModal } from "./wbs-form-modal";
+import { WbsTemplateModal } from "./wbs-template-modal";
+import { ReportFormModal } from "./report-form-modal";
+import { TeamFormModal } from "./team-form-modal";
+import { MaterialInFormModal } from "./material-in-form-modal";
+import { MaterialUsageFormModal } from "./material-usage-form-modal";
+import { PhotoFormModal } from "./photo-form-modal";
+import { DeleteProjectButton } from "./delete-project-button";
+import { PdfModal } from "./pdf-modal";
 import type { Project, ProjectTab } from "./mock-data";
 import {
   formatCurrency,
@@ -98,7 +107,9 @@ function ProjectHeader({ project }: { project: Project }) {
             Deadline
           </p>
           <p className="text-lg font-semibold text-zinc-900">{getDeadlineLabel(project.daysRemaining)}</p>
-          <p className="text-sm text-zinc-500">Target {formatDate(project.targetDate)}</p>
+          <p className="text-sm text-zinc-500">
+            Target {project.targetDate !== "-" ? formatDate(project.targetDate) : "Belum ditentukan"}
+          </p>
         </SurfaceCard>
 
         <SurfaceCard className="space-y-3 p-4">
@@ -142,11 +153,8 @@ function WbsTab({ project }: { project: Project }) {
         description="Mulai dari template WBS atau tambahkan item pertama untuk mengaktifkan kalkulasi progres proyek."
         action={
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button>
-              <Plus className="size-4" />
-              Tambah Item Pertama
-            </Button>
-            <Button variant="outline">Gunakan Template</Button>
+            <WbsFormModal projectId={project.id} />
+            <WbsTemplateModal projectId={project.id} hasExistingItems={false} />
           </div>
         }
       />
@@ -190,11 +198,8 @@ function WbsTab({ project }: { project: Project }) {
             description="Mock shell tabel WBS dengan hierarki 2 level dan validasi total bobot."
             action={
               <div className="flex flex-wrap gap-3">
-                <Button>
-                  <Plus className="size-4" />
-                  Tambah Item
-                </Button>
-                <Button variant="outline">Gunakan Template</Button>
+                <WbsFormModal projectId={project.id} />
+                <WbsTemplateModal projectId={project.id} hasExistingItems={true} />
                 <Button variant="ghost">Atur Ulang Bobot</Button>
               </div>
             }
@@ -256,9 +261,7 @@ function WbsTab({ project }: { project: Project }) {
                     <td className="px-4 py-4 text-zinc-500">{item.updatedAt}</td>
                     <td className="px-4 py-4">
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="sm">
-                          Edit
-                        </Button>
+                        <WbsFormModal projectId={project.id} wbsItem={item} />
                         <Button variant="danger" size="sm">
                           Hapus
                         </Button>
@@ -292,12 +295,7 @@ function ReportsTab({ project }: { project: Project }) {
         icon={<ClipboardList className="size-8" />}
         title="Belum ada laporan harian."
         description="Alur laporan siap dipakai begitu worker auth dan daily report form terhubung."
-        action={
-          <Button>
-            <Plus className="size-4" />
-            Buat Laporan Pertama
-          </Button>
-        }
+        action={<ReportFormModal projectId={project.id} />}
       />
     );
   }
@@ -307,12 +305,7 @@ function ReportsTab({ project }: { project: Project }) {
       <SectionHeader
         title="Laporan Harian"
         description="Filter masih mock, tetapi list dan action state sudah siap untuk diikat ke data source."
-        action={
-          <Button>
-            <Plus className="size-4" />
-            Buat Laporan Hari Ini
-          </Button>
-        }
+        action={<ReportFormModal projectId={project.id} />}
       />
 
       <div className="grid gap-3 md:grid-cols-[200px_200px_1fr]">
@@ -359,7 +352,7 @@ function PhotosTab({ project }: { project: Project }) {
         icon={<Camera className="size-8" />}
         title="Belum ada foto dokumentasi."
         description="Begitu upload flow dihubungkan, galeri ini akan otomatis tampil dengan watermark dan mode seleksi PDF."
-        action={<Button variant="outline">Upload Foto Pertama</Button>}
+        action={<PhotoFormModal projectId={project.id} />}
       />
     );
   }
@@ -371,7 +364,7 @@ function PhotosTab({ project }: { project: Project }) {
         description="Grid 3 kolom desktop, 2 kolom mobile, siap untuk lightbox dan seleksi PDF."
         action={
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline">Upload Foto Manual</Button>
+            <PhotoFormModal projectId={project.id} />
             <Button variant="ghost">Pilih untuk Laporan PDF</Button>
           </div>
         }
@@ -416,12 +409,7 @@ function TeamTab({ project }: { project: Project }) {
         icon={<Users className="size-8" />}
         title="Belum ada anggota tim di proyek ini."
         description="Flow invite via WhatsApp bisa disambungkan nanti tanpa mengubah struktur layout inti."
-        action={
-          <Button>
-            <UserPlus className="size-4" />
-            Tambah Anggota Pertama
-          </Button>
-        }
+        action={<TeamFormModal projectId={project.id} />}
       />
     );
   }
@@ -431,12 +419,7 @@ function TeamTab({ project }: { project: Project }) {
       <SectionHeader
         title="Tim Proyek"
         description="Card tim sudah memuat status, jumlah laporan, dan shell histori aktivitas."
-        action={
-          <Button>
-            <UserPlus className="size-4" />
-            Tambah Anggota
-          </Button>
-        }
+        action={<TeamFormModal projectId={project.id} />}
       />
 
       <div className="grid gap-4 xl:grid-cols-2">
@@ -496,12 +479,7 @@ function MaterialsTab({ project }: { project: Project }) {
         icon={<Hammer className="size-8" />}
         title="Belum ada catatan material."
         description="Tabel material masuk dan pemakaian siap, tinggal dihubungkan ke form modal dan persistence."
-        action={
-          <Button>
-            <Plus className="size-4" />
-            Catat Material Pertama
-          </Button>
-        }
+        action={<MaterialInFormModal projectId={project.id} />}
       />
     );
   }
@@ -512,12 +490,7 @@ function MaterialsTab({ project }: { project: Project }) {
         <SectionHeader
           title="Material Masuk"
           description="Sub-tab pertama untuk pencatatan material datang."
-          action={
-            <Button>
-              <Plus className="size-4" />
-              Catat Material Masuk
-            </Button>
-          }
+          action={<MaterialInFormModal projectId={project.id} />}
         />
 
         <div className="overflow-x-auto">
@@ -550,12 +523,7 @@ function MaterialsTab({ project }: { project: Project }) {
         <SectionHeader
           title="Pemakaian per Item"
           description="Sub-tab kedua untuk mapping material ke item pekerjaan."
-          action={
-            <Button>
-              <Plus className="size-4" />
-              Catat Pemakaian
-            </Button>
-          }
+          action={<MaterialUsageFormModal projectId={project.id} />}
         />
 
         <div className="overflow-x-auto">
@@ -664,9 +632,7 @@ function SettingsTab({ project }: { project: Project }) {
             <Button variant="danger" className="w-full">
               Arsipkan Proyek
             </Button>
-            <Button variant="danger" className="w-full">
-              Hapus Proyek
-            </Button>
+            <DeleteProjectButton projectId={project.id} />
           </div>
         </SurfaceCard>
       </div>
@@ -674,94 +640,7 @@ function SettingsTab({ project }: { project: Project }) {
   );
 }
 
-function PdfModal({ project }: { project: Project }) {
-  return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-3xl rounded-[28px] bg-white p-6 shadow-2xl">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h3 className="text-2xl font-bold text-zinc-900">Buat Laporan PDF</h3>
-            <p className="mt-1 text-sm text-zinc-500">
-              Mock modal 2 langkah untuk {project.name}
-            </p>
-          </div>
-          <Link href={`/projects/${project.id}`} className="text-sm font-semibold text-zinc-500">
-            Tutup
-          </Link>
-        </div>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_280px]">
-          <div className="space-y-4">
-            <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                Langkah 1 · Pilih Konten
-              </p>
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <div className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-500">
-                  Dari tanggal
-                </div>
-                <div className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-500">
-                  Sampai tanggal
-                </div>
-              </div>
-              <div className="mt-4 space-y-2">
-                {project.reports.map((report) => (
-                  <label
-                    key={report.id}
-                    className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white px-4 py-3"
-                  >
-                    <div>
-                      <p className="font-semibold text-zinc-900">{formatDate(report.date)}</p>
-                      <p className="text-sm text-zinc-500">
-                        {report.photos} foto · {report.author}
-                      </p>
-                    </div>
-                    <input type="checkbox" defaultChecked className="size-4 accent-orange-500" />
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-                Langkah 2 · Preview
-              </p>
-              <div className="mt-4 flex min-h-72 items-center justify-center rounded-2xl border border-dashed border-zinc-300 bg-white text-center">
-                <div className="space-y-2 px-6">
-                  <FileStack className="mx-auto size-10 text-zinc-400" />
-                  <p className="font-semibold text-zinc-900">Preview halaman pertama</p>
-                  <p className="text-sm text-zinc-500">
-                    7 halaman estimasi · 20 foto maksimum · siap untuk unduh atau salin link.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4 rounded-3xl border border-zinc-200 bg-white p-5">
-            <h4 className="font-semibold text-zinc-900">Opsi Tambahan</h4>
-            {[
-              "Sertakan ringkasan WBS",
-              "Sertakan daftar anggota tim",
-              "Tampilkan nilai kontrak di laporan",
-            ].map((label, index) => (
-              <label key={label} className="flex items-center justify-between gap-4 rounded-2xl bg-zinc-50 px-4 py-3">
-                <span className="text-sm text-zinc-700">{label}</span>
-                <input type="checkbox" defaultChecked={index < 2} className="size-4 accent-orange-500" />
-              </label>
-            ))}
-            <div className="pt-2">
-              <Button className="w-full">Unduh PDF</Button>
-            </div>
-            <Button variant="outline" className="w-full">
-              Salin Link
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function ProjectDetailContent({
   project,
@@ -826,10 +705,15 @@ export function ProjectDetailContent({
         <SurfaceCard className="space-y-4">
           <SectionHeader title="Aksi Cepat" description="Shortcut utama dari blueprint dashboard/workspace." />
           <div className="grid gap-3">
-            <ButtonLink href={`/projects/${project.id}?tab=reports`} variant="outline" className="justify-start">
-              <ClipboardList className="size-4" />
-              Buat Laporan Harian
-            </ButtonLink>
+            <ReportFormModal 
+              projectId={project.id} 
+              trigger={
+                <Button variant="outline" className="w-full justify-start">
+                  <ClipboardList className="size-4" />
+                  Buat Laporan Harian
+                </Button>
+              }
+            />
             <ButtonLink href="/projects/new" variant="outline" className="justify-start">
               <FolderKanban className="size-4" />
               Buat Proyek Baru

@@ -47,7 +47,7 @@ export function BillingOverview() {
         action={
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/checkout?tier=business"
+              href="/billing/checkout?tier=business"
               className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent-500 px-5 py-2.5 text-sm font-medium text-white shadow-xs transition hover:bg-accent-600"
             >
               Upgrade ke Business

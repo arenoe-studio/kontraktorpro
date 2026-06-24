@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, MapPin, PhoneCall, Star } from "lucide-react";
-import { getContractorBySlug } from "./content";
+import { getPublicContractorBySlug, getContractorPortfolio, getContractorReviews } from "@/features/marketing/marketing-service";
 import {
   Badge,
   Container,
@@ -19,11 +19,20 @@ export async function KontraktorProfilePage({
   params: Params;
 }) {
   const { slug } = await params;
-  const contractor = getContractorBySlug(slug);
+  const contractorProfile = await getPublicContractorBySlug(slug);
 
-  if (!contractor) {
+  if (!contractorProfile) {
     notFound();
   }
+
+  const portfolio = await getContractorPortfolio(contractorProfile.userId);
+  const reviews = await getContractorReviews(contractorProfile.id);
+
+  const contractor = {
+    ...contractorProfile,
+    portfolio,
+    reviews,
+  };
 
   return (
     <>

@@ -115,7 +115,7 @@ export function DashboardPage({ data }: { data: DashboardSummary }) {
           title="Proyek Aktif"
           value={`${data.activeProjectCount}`}
           helper={proyek_aktif_helper}
-          href="/projects?status=aktif"
+          href="/projects?status=active"
           icon="projects"
           accent={palette.primary}
         />
@@ -139,7 +139,7 @@ export function DashboardPage({ data }: { data: DashboardSummary }) {
           title="Selesai Bulan Ini"
           value={`${data.finishedThisMonth}`}
           helper="Proyek selesai bulan ini"
-          href="/projects?status=selesai"
+          href="/projects?status=completed"
           icon="finished"
           accent={palette.success}
         />

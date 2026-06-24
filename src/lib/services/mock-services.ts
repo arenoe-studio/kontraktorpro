@@ -8,15 +8,6 @@ import type {
   SessionService,
 } from "./contracts";
 
-export const mockOtpService: AuthOtpService = {
-  async sendOtp(email, _code) {
-    return {
-      success: true,
-      data: { challengeId: `otp-${email}` },
-      message: "Kode OTP berhasil dikirim.",
-    };
-  },
-};
 
 export const mockFileStorageService: FileStorageService = {
   async createUploadUrl(fileName) {

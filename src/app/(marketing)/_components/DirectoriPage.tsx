@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTierRank, contractors } from "./content";
+import { getPublicContractors } from "@/features/marketing/marketing-service";
 import {
   Container,
   ContractorDirectoryCard,
@@ -20,44 +20,24 @@ type SearchParams = Promise<{
   page?: string;
 }>;
 
-function sortContractors(items: typeof contractors, sort: string) {
-  const sorted = [...items];
-  if (sort === "Proyek Terbanyak") {
-    return sorted.sort((a, b) => b.completedProjects - a.completedProjects || getTierRank(b.packageTier) - getTierRank(a.packageTier));
-  }
-
-  if (sort === "Terbaru Bergabung") {
-    return sorted.sort((a, b) => Number(b.since) - Number(a.since) || getTierRank(b.packageTier) - getTierRank(a.packageTier));
-  }
-
-  return sorted.sort((a, b) => b.rating - a.rating || getTierRank(b.packageTier) - getTierRank(a.packageTier));
-}
-
 export async function DirectoriPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const query = params.q?.toLowerCase().trim() ?? "";
+  const currentPage = Number(params.page ?? "1") || 1;
+
   const city = params.city ?? "";
   const specialty = params.specialty ?? "";
   const sort = params.sort ?? "Rating Tertinggi";
-  const currentPage = Number(params.page ?? "1") || 1;
 
-  const filtered = sortContractors(
-    contractors.filter((contractor) => {
-      if (!contractor.active) return false;
-      const matchesQuery =
-        !query ||
-        contractor.businessName.toLowerCase().includes(query) ||
-        contractor.ownerName.toLowerCase().includes(query);
-      const matchesCity = !city || contractor.city === city;
-      const matchesSpecialty = !specialty || contractor.specialties.includes(specialty);
-      return matchesQuery && matchesCity && matchesSpecialty;
-    }),
-    sort,
-  );
+  const filtered = await getPublicContractors({
+    query: params.q,
+    city: params.city,
+    specialty: params.specialty,
+    sort: params.sort,
+  });
 
   const perPage = 12;
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));

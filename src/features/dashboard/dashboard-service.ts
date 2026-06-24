@@ -30,6 +30,8 @@ import {
   projectMembers,
   projects,
   users,
+  materials,
+  projectPhotos,
 } from "@/lib/db/schema";
 
 import {
@@ -128,7 +130,7 @@ export async function getDashboardData(userId: string): Promise<DashboardSummary
   let rawActivities: typeof activityLogs.$inferSelect[] = [];
   let activityLoadError = false;
 
-  const [rawReports, rawMembers, rawPortfolios] = await Promise.all([
+  const [rawReports, rawMembers, rawPortfolios, rawMaterials, rawPhotos] = await Promise.all([
     // Query 1: daily_reports untuk semua proyek user
     db
       .select()
@@ -151,6 +153,18 @@ export async function getDashboardData(userId: string): Promise<DashboardSummary
       .select()
       .from(portfolioEntries)
       .where(inArray(portfolioEntries.projectId, projectIds)),
+
+    // Query 4: materials untuk menghitung total material yang tercatat
+    db
+      .select()
+      .from(materials)
+      .where(inArray(materials.projectId, projectIds)),
+
+    // Query 5: project_photos untuk menghitung foto hari ini
+    db
+      .select()
+      .from(projectPhotos)
+      .where(inArray(projectPhotos.projectId, projectIds)),
   ]);
 
   // Activity logs — partial failure pattern
@@ -341,7 +355,7 @@ export async function getDashboardData(userId: string): Promise<DashboardSummary
       targetDate: fullProject.targetDate ?? null,
       daysRemaining,
       reportCount: reportCountByProject.get(p.id) ?? 0,
-      photoCount: 0, // Tabel project_photos belum tersedia
+      photoCount: rawPhotos.filter(photo => photo.projectId === p.id).length,
     };
   });
 
@@ -365,11 +379,21 @@ export async function getDashboardData(userId: string): Promise<DashboardSummary
     nearestDeadlineDays = Math.min(...deadlineDays);
   }
 
-  // photosToday: 0 — tabel project_photos belum tersedia
-  const photosToday = 0;
+  // photosToday: hitung jumlah foto yang diunggah hari ini
+  let photosToday = 0;
+  for (const photo of rawPhotos) {
+    const photoWIB = toWIB(photo.createdAt);
+    if (
+      photoWIB.getUTCFullYear() === todayWIBYear &&
+      photoWIB.getUTCMonth() === todayWIBMonth &&
+      photoWIB.getUTCDate() === todayWIBDate
+    ) {
+      photosToday++;
+    }
+  }
 
-  // materialsRecordedTotal: 0 — tabel material_entries belum tersedia
-  const materialsRecordedTotal = 0;
+  // materialsRecordedTotal: jumlah total data masuk di tabel materials
+  const materialsRecordedTotal = rawMaterials.length;
 
   // activeMemberCount: jumlah project_members aktif lintas semua proyek user
   const activeMemberCount = rawMembers.length;

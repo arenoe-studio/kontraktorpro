@@ -50,7 +50,7 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const phoneForm = useForm<ForgotPasswordEmailValues>({
+  const emailForm = useForm<ForgotPasswordEmailValues>({
     resolver: zodResolver(forgotPasswordEmailSchema),
     mode: "onBlur",
     defaultValues: {
@@ -146,7 +146,7 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
         {state.step === 1 ? (
           <form
             className="space-y-5"
-            onSubmit={phoneForm.handleSubmit((values) => {
+            onSubmit={emailForm.handleSubmit((values) => {
               setError(null);
               setMessage(null);
               startTransition(async () => {
@@ -155,7 +155,7 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
                   if (result.fieldErrors) {
                     Object.entries(result.fieldErrors).forEach(([field, message]) => {
                       if (message) {
-                        phoneForm.setError(field as keyof ForgotPasswordEmailValues, {
+                        emailForm.setError(field as keyof ForgotPasswordEmailValues, {
                           message,
                         });
                       }
@@ -170,8 +170,8 @@ export function ForgotPasswordFlow({ initialState }: ForgotPasswordFlowProps) {
               });
             })}
           >
-            <Field label="Email" htmlFor="email" error={phoneForm.formState.errors.email?.message}>
-              <TextInput id="email" type="email" inputMode="email" placeholder="nama@email.com" error={phoneForm.formState.errors.email?.message} {...phoneForm.register("email")} />
+            <Field label="Email" htmlFor="email" error={emailForm.formState.errors.email?.message}>
+              <TextInput id="email" type="email" inputMode="email" placeholder="nama@email.com" error={emailForm.formState.errors.email?.message} {...emailForm.register("email")} />
             </Field>
 
             <PrimaryButton type="submit" disabled={pending}>

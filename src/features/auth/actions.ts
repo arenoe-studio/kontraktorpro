@@ -56,7 +56,7 @@ async function setSessionCookie(userId: string) {
   cookieStore.set(SESSION_COOKIE, userId, {
       httpOnly: true,
       sameSite: "lax",
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 30 * 24 * 60 * 60,
     });
@@ -67,7 +67,7 @@ async function setOtpCookie(challengeId: string) {
   cookieStore.set(OTP_CHALLENGE_COOKIE, challengeId, {
       httpOnly: true,
       sameSite: "lax",
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 15 * 60,
     });
@@ -78,8 +78,8 @@ async function setResetCookie(challengeId: string) {
   cookieStore.set(RESET_CHALLENGE_COOKIE, challengeId, {
       httpOnly: true,
       sameSite: "lax",
-      secure: true,
-      path: "/forgot-password",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
       maxAge: 15 * 60,
     });
 }

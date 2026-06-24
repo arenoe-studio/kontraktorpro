@@ -52,7 +52,7 @@ export function AppSidebar({
     <aside
       className={cn(
         "flex h-screen w-60 flex-col gap-6 overflow-y-auto border-r border-white/10 p-4 text-white",
-        admin ? "bg-primary-900" : "bg-primary-800",
+        admin ? "bg-zinc-950" : "bg-zinc-950",
         className,
       )}
     >

@@ -72,7 +72,7 @@
 | Admin finance | `admin/finance` | BUILT — static mock data | HIGH |
 | Admin packages | `admin/packages` | BUILT — static mock data | HIGH |
 | Admin activity logs | `admin/logs` | BUILT — static mock data | HIGH |
-| WBS management | `(app)/projects/[id]?tab=wbs` | BUILT — read-only mock | CRITICAL |
+| WBS management | `(app)/projects/[id]?tab=wbs` | BUILT — CRUD + Template apply (4 pre-defined templates) | CRITICAL |
 | Daily reports | `(app)/projects/[id]?tab=reports` | BUILT — read-only mock | CRITICAL |
 | Photo gallery | `(app)/projects/[id]?tab=photos` | BUILT — read-only mock | CRITICAL |
 | Team management | `(app)/projects/[id]?tab=team` | BUILT — read-only mock | CRITICAL |
@@ -442,7 +442,7 @@ Based on `IMPLEMENTATION_PLAN.md` and `design-reference/markdown/` blueprints.
 
 | Feature | Phase | Blueprint file | Notes |
 |---|---|---|---|
-| WBS create/edit | Phase 4 | `blueprint-3-5-wbs-proyek.md` | Currently read-only mock |
+| WBS create/edit | Phase 4 | `blueprint-3-5-wbs-proyek.md` | IMPLEMENTED — create item + apply template |
 | Daily report form | Phase 4 | `blueprint-3-6-form-laporan-harian.md` | Currently read-only mock |
 | Daily report list | Phase 4 | `blueprint-3-7-daftar-laporan-harian.md` | Currently read-only mock |
 | Daily report detail | Phase 4 | `blueprint-3-8-detail-laporan-harian.md` | Currently read-only mock |

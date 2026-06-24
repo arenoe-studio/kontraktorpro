@@ -71,6 +71,16 @@ export const emailOtpService: AuthOtpService = {
     email: string,
     code: string,
   ) {
+    if (process.env.NODE_ENV === "development") {
+      console.log(`\n=================================================`);
+      console.log(`[DEV ONLY] OTP CODE FOR ${email}: ${code}`);
+      console.log(`=================================================\n`);
+      if (!process.env.RESEND_API_KEY) {
+        console.log(`[DEV ONLY] Bypassing Resend because API key is missing.`);
+        return { success: true, data: { challengeId: "" } };
+      }
+    }
+
     try {
       const { error } = await getResend().emails.send({
         from: FROM_EMAIL,
@@ -81,6 +91,9 @@ export const emailOtpService: AuthOtpService = {
 
       if (error) {
         console.error("[email-otp-service] Resend error:", error);
+        if (process.env.NODE_ENV === "development") {
+          return { success: true, data: { challengeId: "" } };
+        }
         return {
           success: false,
           message: "Gagal mengirim email OTP. Coba lagi.",
@@ -88,7 +101,11 @@ export const emailOtpService: AuthOtpService = {
       }
 
       return { success: true, data: { challengeId: "" } };
-    } catch {
+    } catch (err) {
+      console.error("[email-otp-service] Resend exception:", err);
+      if (process.env.NODE_ENV === "development") {
+        return { success: true, data: { challengeId: "" } };
+      }
       return {
         success: false,
         message: "Gagal mengirim email OTP. Coba lagi.",

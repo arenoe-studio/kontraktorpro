@@ -232,6 +232,7 @@ async function main() {
         status: "submitted",
         weather: r.weather,
         notes: r.notes,
+        reportDate: reportDateStr,
         createdAt: reportDate,
       });
       reportInsertCount++;

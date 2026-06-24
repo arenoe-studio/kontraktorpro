@@ -85,16 +85,18 @@ export function Button({
   type = "button",
   variant = "primary",
   size = "md",
-}: ButtonProps & { type?: "button" | "submit" | "reset" }) {
+  ...props
+}: ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl transition-colors",
+        "inline-flex items-center justify-center gap-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
         buttonVariants[variant],
         buttonSizes[size],
         className
       )}
+      {...props}
     >
       {children}
     </button>

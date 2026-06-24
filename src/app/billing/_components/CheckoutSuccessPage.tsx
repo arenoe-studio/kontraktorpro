@@ -1,4 +1,3 @@
-import { AppNavbar } from "@/components/layout/app-navbar";
 import { PaymentStatus } from "./payment-status";
 
 export async function CheckoutSuccessPage({
@@ -9,13 +8,10 @@ export async function CheckoutSuccessPage({
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <AppNavbar />
-      <PaymentStatus
-        tier={params.tier}
-        method={params.method}
-        status={params.status}
-      />
-    </div>
+    <PaymentStatus
+      tier={params.tier}
+      method={params.method}
+      status={params.status}
+    />
   );
 }

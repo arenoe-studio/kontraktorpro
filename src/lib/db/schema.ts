@@ -68,6 +68,9 @@ export const contractorProfiles = pgTable("contractor_profiles", {
   slug: varchar("slug", { length: 180 }).notNull().unique(),
   headline: varchar("headline", { length: 255 }),
   about: text("about"),
+  specialties: varchar("specialties", { length: 120 }).array(),
+  heroImage: text("hero_image"),
+  phoneVisible: boolean("phone_visible").default(false).notNull(),
   verifiedProjects: integer("verified_projects").default(0).notNull(),
   rating: integer("rating").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -110,6 +113,16 @@ export const subscriptions = pgTable("subscriptions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const contractorReviews = pgTable("contractor_reviews", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  contractorId: uuid("contractor_id").notNull(),
+  reviewerName: varchar("reviewer_name", { length: 160 }).notNull(),
+  rating: integer("rating").notNull(),
+  comment: text("comment"),
+  status: moderationStatusEnum("status").default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const activityLogs = pgTable("activity_logs", {
   id: uuid("id").defaultRandom().primaryKey(),
   actorId: uuid("actor_id"),
@@ -120,13 +133,39 @@ export const activityLogs = pgTable("activity_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const wbsStatusEnum = pgEnum("wbs_status", [
+  "Belum Dimulai",
+  "Dalam Pengerjaan",
+  "Tertunda",
+  "Selesai",
+]);
+
+export const wbsItems = pgTable("wbs_items", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  projectId: uuid("project_id").notNull(),
+  parentId: uuid("parent_id"), // for hierarchy (level 1 vs level 2)
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 120 }).notNull(),
+  weight: integer("weight").notNull(), // percentage
+  volume: varchar("volume", { length: 120 }), // e.g. "100 m2"
+  progress: integer("progress").default(0).notNull(), // 0-100
+  status: wbsStatusEnum("status").default("Belum Dimulai").notNull(),
+  assignee: varchar("assignee", { length: 180 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const dailyReports = pgTable("daily_reports", {
   id: uuid("id").defaultRandom().primaryKey(),
   projectId: uuid("project_id").notNull(),
   authorId: uuid("author_id"),
   status: reportStatusEnum("status").default("draft").notNull(),
   weather: varchar("weather", { length: 80 }),
+  hasIssue: boolean("has_issue").default(false).notNull(),
+  updatedItemsCount: integer("updated_items_count").default(0).notNull(),
+  photosCount: integer("photos_count").default(0).notNull(),
   notes: text("notes"),
+  reportDate: date("report_date").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -151,5 +190,39 @@ export const otpChallenges = pgTable("otp_challenges", {
   lockedUntil: timestamp("locked_until"),
   isVerified: boolean("is_verified").default(false).notNull(),
   metadata: text("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const materials = pgTable("materials", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  projectId: uuid("project_id").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  quantity: varchar("quantity", { length: 80 }).notNull(), // e.g., "100 sak"
+  supplier: varchar("supplier", { length: 180 }),
+  recordedBy: varchar("recorded_by", { length: 160 }),
+  date: date("date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const materialUsages = pgTable("material_usages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  projectId: uuid("project_id").notNull(),
+  wbsItemId: uuid("wbs_item_id"), // Optional, linked to WBS item
+  wbsItemName: varchar("wbs_item_name", { length: 255 }), // Denormalized or fallback
+  materialName: varchar("material_name", { length: 255 }).notNull(),
+  quantity: varchar("quantity", { length: 80 }).notNull(), // e.g., "5 sak"
+  note: text("note"),
+  date: date("date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const projectPhotos = pgTable("project_photos", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  projectId: uuid("project_id").notNull(),
+  uploaderName: varchar("uploader_name", { length: 160 }),
+  wbsItemId: uuid("wbs_item_id"), // linked to WBS item if specific
+  wbsItemName: varchar("wbs_item_name", { length: 255 }), // fallback for label
+  url: text("url").notNull(),
+  angle: varchar("angle", { length: 120 }), // e.g. "Tampak Depan", "Detail"
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

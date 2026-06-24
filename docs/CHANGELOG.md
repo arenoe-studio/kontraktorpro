@@ -6,6 +6,252 @@
 
 ---
 
+## 2026-06-24 09:35 — Feature: Implementasi Ekspor Laporan PDF
+
+### Added
+- `src/lib/services/pdf-client-service.ts` — Utilitas pembuatan PDF sisi klien menggunakan `jspdf`.
+- `src/app/(app)/_components/pdf-modal.tsx` — Modal UI (Client Component) untuk mengatur dan men-trigger ekspor PDF.
+
+### Modified
+- `package.json` — Menambahkan dependensi `jspdf` dan `html2canvas`.
+- `src/app/(app)/_components/project-detail-content.tsx` — Mengganti modal PDF mock dengan `PdfModal` yang diimpor dari file terpisah.
+- `docs/chain-of-truth/srs.md` — Mengubah status ekspor PDF dari "Out of Scope" menjadi "In Scope" dengan pendekatan sisi klien.
+
+### Changes
+- Fitur "Buat Laporan PDF" sekarang sepenuhnya fungsional dan beroperasi di sisi klien (browser) untuk menghindari kebutuhan pembuatan API Routes tambahan.
+
+### Risks
+- Low — Modifikasi terisolasi pada UI sisi klien dan tidak berdampak pada struktur backend.
+
+### Dependencies
+- Added: `jspdf`, `html2canvas` — Digunakan untuk merender struktur data proyek menjadi layout laporan PDF.
+
+---
+
+## 2026-06-24 09:25 — Bugfix: Perbaiki Shortcut Buat Laporan Harian
+
+### Modified
+- `src/app/(app)/_components/report-form-modal.tsx` — Menambahkan prop `trigger` opsional pada `ReportFormModal` agar dapat dipanggil oleh custom element.
+- `src/app/(app)/_components/project-detail-content.tsx` — Mengganti `ButtonLink` statis untuk "Buat Laporan Harian" di bagian Aksi Cepat dengan `ReportFormModal` yang memiliki custom trigger.
+
+### Changes
+- Tombol shortcut "Buat Laporan Harian" pada halaman overview proyek kini akan langsung membuka modal formulir, bukan sekadar navigasi.
+
+### Risks
+- Low — Perubahan terbatas pada integrasi komponen modal.
+
+### Dependencies
+- None
+
+## 2026-06-24 09:20 — Bugfix: Perbaiki Tombol Edit pada WBS
+
+### Modified
+- `src/app/(app)/_components/wbs-form-modal.tsx` — Menambahkan prop `wbsItem` opsional untuk mendukung mode edit (menampilkan data yang sudah ada dan memanggil `updateWbsItemAction` saat disimpan).
+- `src/app/(app)/_components/project-detail-content.tsx` — Mengganti tombol "Edit" statis di `WbsTab` dengan `<WbsFormModal>` yang menerima prop `wbsItem`.
+
+### Changes
+- Menyambungkan tombol Edit pada tabel WBS agar fungsional dan bisa mengedit data WBS.
+
+### Risks
+- Low — Perubahan terbatas pada komponen WBS modal dan tidak mengganggu fungsionalitas lain.
+
+### Dependencies
+- None
+
+## 2026-06-24 06:18 — Feature: Implementasi Fitur Template WBS
+
+### Added
+- `src/features/wbs/wbs-templates.ts` — Definisi 4 template WBS pre-defined: Rumah Tinggal, Gedung Komersial/Kantor, Renovasi Interior, Infrastruktur Jalan. Setiap template total bobot = 100%.
+- `src/app/(app)/_components/wbs-template-modal.tsx` — Client component modal dua langkah: (1) grid pilihan template, (2) konfirmasi replace jika WBS sudah ada. Memanggil `applyWbsTemplateAction` dan menampilkan toast.
+
+### Modified
+- `src/features/wbs/wbs-service.ts` — Tambah `clearWbsItemsByProjectId()` (delete semua WBS item + reset progress=0) dan `bulkCreateWbsItems()` (batch insert + recalculate progress). Import `inArray` dari drizzle-orm.
+- `src/features/wbs/actions.ts` — Tambah `applyWbsTemplateAction(projectId, templateKey, replace)`. Validasi UUID + lookup template + clear (jika replace) + bulk insert + revalidatePath.
+- `src/app/(app)/_components/project-detail-content.tsx` — Replace kedua tombol "Gunakan Template" non-fungsional dengan `<WbsTemplateModal>` di empty state (hasExistingItems=false) dan toolbar (hasExistingItems=true).
+
+### Changes
+- Tombol "Gunakan Template" di tab WBS sekarang fungsional: membuka modal, pengguna memilih template, template di-apply ke DB.
+- Jika WBS sudah ada: flow menampilkan langkah konfirmasi (step 2) dengan preview item sebelum replace.
+- Jika WBS kosong: apply langsung tanpa konfirmasi.
+- TypeScript typecheck: 0 error (`npm run typecheck`).
+
+### Risks
+- Low — tidak ada perubahan schema DB, tidak ada perubahan pada fitur auth/session. Fungsi `clearWbsItemsByProjectId` destruktif tapi dilindungi oleh konfirmasi UI dua langkah dan `requireRole("contractor")`.
+
+### Dependencies
+- None — tidak ada dependency baru.
+
+## 2026-06-24 06:05 — Feature: Implementasi Halaman Pengaturan Akun dan Profil & Portofolio
+
+### Added
+- `src/app/(app)/settings/layout.tsx` — Layout rute pengaturan dengan sidebar menu (Akun dan Profil & Portofolio).
+- `src/app/(app)/settings/account/page.tsx` — Halaman Pengaturan Akun dengan form ganti password dan zona bahaya (Blueprint 3.14).
+- `src/app/(app)/settings/profile/page.tsx` — Halaman Profil Publik & Portofolio dengan form pengubahan informasi publik (Blueprint 3.12).
+- `src/app/(app)/settings/_components/account-form.tsx` — Komponen Client interaktif untuk ganti password.
+- `src/app/(app)/settings/_components/profile-form.tsx` — Komponen Client interaktif untuk pengaturan profil bisnis (mendukung pengubahan Nama Pemilik dan Nama Usaha).
+- `src/features/settings/settings-service.ts` — Lapisan layanan dengan Drizzle ORM yang terhubung ke `contractor_profiles` dan `users` (update profil, nama, ganti password, generate slug otomatis).
+- `src/features/settings/actions.ts` — Server actions type-safe (`changePasswordAction` dan `saveProfileAction`).
+
+### Modified
+- `src/lib/navigation.ts` — Menambahkan link `Pengaturan` di sidebar kontraktor.
+- `docs/chain-of-truth/information_architecture.md` — Menambahkan PAGE-M03-006 dan PAGE-M03-007, sinkronisasi konteks rute pengaturan akun dan profil.
+
+### Changes
+- Fitur Pengaturan Akun dan Profil telah diimplementasikan sebagai halaman mandiri (bukan modal) sesuai dengan Information Architecture baru yang sudah dikonfirmasi.
+- Perubahan form mengirim data ke DB via Server Actions. Lulus validasi `npm run typecheck` tanpa kesalahan (0 emit errors).
+
+### Risks
+- Low — Semua logic terisolasi dalam direktori `/settings` dan hanya berdampak pada tabel `users` serta `contractor_profiles` saat mutasi dari pengguna yang terautentikasi.
+
+### Dependencies
+- None
+
+## 2026-06-24 04:39 — Feature: Tambah fungsi Hapus Proyek
+
+### Added
+- `src/features/projects/projects-service.ts` — Tambah fungsi `deleteProject` yang secara spesifik menghapus semua relasi dependen dari tabel menggunakan DB Transaction untuk mengatasi tidak adanya properti `CASCADE` di Drizzle layer.
+- `src/features/projects/actions.ts` — Tambah Server Action `deleteProjectAction`.
+- `src/app/(app)/_components/project-detail-content.tsx` — Menambahkan komponen `DeleteProjectButton` dengan konfirmasi `window.confirm` dan mengganti button mock statis di SettingsTab.
+
+### Changes
+- Saat menghapus proyek, semua WBS, Laporan Harian, Anggota Tim, Material Masuk, Material Keluar, dan Foto Dokumentasi akan dibersihkan secara aman (tanpa *orphan constraint errors*).
+- Menambahkan UX konfirmasi sebelum penghapusan dieksekusi secara permanen, dan auto-redirect kembali ke halaman `/projects`.
+
+### Risks
+- High Impact Action — Menghapus data secara permanen. Pengguna sudah diberi peringatan "Apakah Anda yakin?".
+
+### Dependencies
+- None
+
+## 2026-06-24 04:30 — Feature: Integrasi Tahap 5 (Tim, Material, Foto) & Tahap 6 (Dashboard)
+
+### Added
+- `src/features/team/` — Schema, Service, dan Action untuk anggota tim.
+- `src/features/materials/` — Schema, Service, dan Action untuk material masuk dan pemakaian material.
+- `src/features/photos/` — Schema, Service, dan Action untuk galeri foto proyek.
+- `src/app/(app)/_components/team-form-modal.tsx` — Modal UI tambah anggota tim.
+- `src/app/(app)/_components/material-in-form-modal.tsx` — Modal UI catat material masuk.
+- `src/app/(app)/_components/material-usage-form-modal.tsx` — Modal UI catat pemakaian material.
+- `src/app/(app)/_components/photo-form-modal.tsx` — Modal UI upload foto proyek (berbasis URL string sementara).
+
+### Modified
+- `src/app/(app)/_components/ProjectDetailPage.tsx` — Menyambungkan data agregasi WBS, Laporan, Tim, Material, dan Foto langsung dari Drizzle Postgres DB.
+- `src/app/(app)/_components/project-detail-content.tsx` — Mengganti tombol mock dengan import Form Modal nyata untuk Tim, Material, dan Foto.
+- `src/features/dashboard/dashboard-service.ts` — Mengupdate `getDashboardData` agar KPI 'Material Tercatat' dan 'Foto Hari Ini' membaca dari tabel database yang asli.
+
+### Changes
+- Fitur Tahap 5 selesai sepenuhnya dengan validasi Zod dan Server Actions yang `Type Safe`.
+- Fitur Tahap 6 selesai sepenuhnya: Dashboard Utama sekarang membaca 100% data nyata dari Postgres (Total proyek, proyek delay, laporan selesai hari ini, jumlah anggota, jumlah foto, dll).
+- Error handling di semua Server Actions menggunakan skema `try-catch` dengan feedback message yang valid.
+- Lulus `npm run typecheck` tanpa kesalahan di seluruh layer backend dan komponen Client.
+
+### Risks
+- Low — Fitur ditambahkan secara terisolasi menggunakan pattern Action/Service yang konsisten.
+- Form upload foto masih mengandalkan input URL string; integrasi file upload API sesungguhnya (seperti AWS S3 atau UploadThing) ditangguhkan ke iterasi rilis minor berikutnya.
+
+### Dependencies
+- None
+
+## 2026-06-24 02:50 — UI/UX: Perbaikan sidebar dan penyelarasan alur dashboard
+
+### Modified
+- `src/components/layout/app-shell.tsx` — tambah class `sticky top-0 h-screen` ke wrapper sidebar agar lengket dan memenuhi layar penuh
+- `src/components/layout/app-sidebar.tsx` — ubah warna background dari biru (`bg-primary-800`) menjadi gelap (`bg-zinc-950`) agar logo lebih kontras
+- `src/app/(app)/_components/DashboardPage.tsx` — perbaikan query param url dari `?status=aktif` ke `?status=active` dan `?status=selesai` ke `?status=completed` sesuai definisi enum
+
+### Changes
+- Memperbaiki tampilan awal setelah login dengan mengubah sidebar menjadi full-height dan berwarna gelap.
+- Menyelaraskan routing pada tombol stat card di dashboard ke parameter query status yang benar agar sinkron dengan `ProjectsPage.tsx`.
+
+### Risks
+- Low — Hanya modifikasi UI dan perbaikan string literal untuk routing.
+
+### Dependencies
+- None
+
+## 2026-06-24 02:22 — Chore: Tighten `CLAUDE.md` workflow and Chain of Truth rules
+
+### Modified
+- `CLAUDE.md` — memperjelas workflow default untuk studi dulu lalu konfirmasi sebelum eksekusi, kecuali ada instruksi eksplisit langsung eksekusi
+- `CLAUDE.md` — menyelaraskan aturan Chain of Truth sebagai acuan utama dan menambahkan kewajiban sinkronisasi dokumen konteks pada sesi yang sama
+
+### Changes
+- Menegaskan bahwa setiap prompt harus dipelajari dan dikonfirmasi dulu sebelum tindakan apa pun
+- Menjadikan Chain of Truth sebagai acuan hierarkis untuk membaca scope, flow, dan implikasi perubahan
+- Menambahkan aturan bahwa perubahan konteks proyek wajib diikuti pembaruan dokumen konteks terkait agar tidak terjadi gap atau konflik
+
+### Risks
+- Low — perubahan hanya pada dokumen operasional dan tidak memengaruhi runtime code
+
+### Dependencies
+- None
+
+## 2026-06-23 03:00 — Bugfix: Forgot Password local environment fix
+
+### Modified
+- `src/lib/services/email-otp-service.ts` — Added logic to bypass Resend API and log OTP code to console in development mode to prevent challenge deletion.
+- `src/features/auth/actions.ts` — Updated `setSessionCookie`, `setOtpCookie`, and `setResetCookie` to use dynamic `secure` based on `NODE_ENV`. Changed reset cookie path to `/` to avoid deletion issues.
+- `src/features/auth/components/forgot-password-flow.tsx` — Renamed legacy `phoneForm` variable to `emailForm`.
+
+### Changes
+- Fixed issue where local developers without Resend API Key could not test or bypass the forgot password flow.
+- Fixed issue where accessing local dev via IP instead of localhost would reject `secure: true` cookies and break OTP verification.
+- Improved code consistency by removing leftover `phoneForm` references.
+
+### Risks
+- Low — Only affects development environments and fixes cookie strictness issues on local networks.
+
+---
+
+## 2026-06-23 — Docs: Implementasi Chain of Truth Documentation System
+
+### Added
+- `docs/chain-of-truth/srs.md` — Software Requirements Specification v1.0 (SoT-1)
+- `docs/chain-of-truth/information_architecture.md` — Information Architecture v1.0 (SoT-2)
+- `docs/chain-of-truth/design_system.md` — Design System v1.0 (SoT-3)
+- `docs/chain-of-truth/data_model.md` — Data Model v1.0 (dari schema.ts aktual)
+- `docs/chain-of-truth/user_flows/index.md` — Master index user flows
+- `docs/chain-of-truth/user_flows/userflow_uc_001.md` — UC-001: Registrasi Kontraktor
+- `docs/chain-of-truth/user_flows/userflow_uc_002.md` — UC-002: Login Password
+- `docs/chain-of-truth/user_flows/userflow_uc_003.md` — UC-003: Login OTP Email
+- `docs/chain-of-truth/user_flows/userflow_uc_004.md` — UC-004: Verifikasi OTP
+- `docs/chain-of-truth/user_flows/userflow_uc_005.md` — UC-005: Reset Password
+- `docs/chain-of-truth/user_flows/userflow_uc_006.md` — UC-006: Dashboard (mock)
+- `docs/chain-of-truth/user_flows/userflow_uc_007.md` — UC-007: Daftar Proyek (mock)
+- `docs/chain-of-truth/user_flows/userflow_uc_008.md` — UC-008: Buat Proyek (mock)
+- `docs/chain-of-truth/user_flows/userflow_uc_009.md` — UC-009: Detail Proyek (mock)
+- `docs/chain-of-truth/user_flows/userflow_uc_010.md` — UC-010: Edit Proyek (mock)
+- `docs/chain-of-truth/user_flows/userflow_uc_011.md` — UC-011: WBS & Laporan Harian (planned)
+- `docs/chain-of-truth/user_flows/userflow_uc_012.md` — UC-012: Billing & Checkout (mock)
+- `docs/chain-of-truth/system_logics/index.md` — Master index system logics
+- `docs/chain-of-truth/system_logics/sys_uc_001.md` — SL-001: Registrasi (Server Action contracts + sequence diagram)
+- `docs/chain-of-truth/system_logics/sys_uc_002.md` — SL-002: Login Password + OTP
+- `docs/chain-of-truth/system_logics/sys_uc_003.md` — SL-003: Verifikasi OTP
+- `docs/chain-of-truth/system_logics/sys_uc_004.md` — SL-004: Reset Password
+- `docs/chain-of-truth/test_plan.md` — Test Plan v1.0 (F001 auth)
+- `docs/chain-of-truth/test_cases.md` — 24 test cases untuk F001 (auth)
+- `docs/chain-of-truth/test_execution_sheet.md` — Template execution sheet
+- `docs/chain-of-truth/prompts.md` — Panduan penggunaan Chain of Truth dengan AI agent
+
+### Changes
+- Adaptasi penuh sistem Chain of Truth dari referensi POS ke KontraktorPro
+- SRS mendokumentasikan 12 fitur (F001–F012) dengan status implementasi masing-masing
+- IA memetakan seluruh 29 route ke dalam 5 module dengan guard type per halaman
+- Design System mengadopsi token biru (blue-600) sebagai warna primer profesional
+- Data Model diturunkan dari `src/lib/db/schema.ts` aktual dengan 9 entitas
+- System Logics untuk auth menggunakan Server Action contracts (bukan REST API)
+- 12 User Flows dibuat: 5 auth (IMPLEMENTED) + 7 app (MOCK/PLANNED)
+- Test cases fokus pada F001 — satu-satunya fitur real yang dapat diuji end-to-end
+
+### Risks
+- Low — dokumentasi saja, tidak ada perubahan kode
+- System Logics harus diperbarui ketika fitur mock dikonversi ke implementasi real
+
+### Dependencies
+- None
+
+---
+
 ## 2026-05-27 — Chore: Checkpoint — Verifikasi type check dan build (Task 13)
 
 ### Modified

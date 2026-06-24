@@ -7,6 +7,7 @@ import {
   Home,
   Layers3,
   Users,
+  Settings,
 } from "lucide-react";
 
 export const marketingNavigation = [
@@ -20,6 +21,8 @@ export const contractorSidebarNavigation = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/projects", label: "Proyek Saya", icon: FolderKanban },
   { href: "/billing", label: "Langganan", icon: CreditCard },
+  { href: "/settings/account", label: "Pengaturan", icon: Settings },
+
 ];
 
 export const adminSidebarNavigation = {

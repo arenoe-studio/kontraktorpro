@@ -2,8 +2,6 @@ import Link from "next/link";
 import { Camera, ClipboardList, Plus, Search } from "lucide-react";
 import {
   getDeadlineLabel,
-  getProjectCounts,
-  getProjects,
   getStatusBadgeVariant,
   getStatusLabel,
 } from "./mock-data";
@@ -19,50 +17,25 @@ import {
   palette,
 } from "./ui";
 
-type ProjectListSearchParams = Promise<{
+import { type ProjectCounts, type ProjectListItem } from "@/features/projects/projects-service";
+
+type ProjectListSearchParams = {
   status?: string;
   q?: string;
   sort?: string;
-}>;
+};
 
-function normalizeStatus(status?: string): ProjectStatus | "semua" {
-  if (status === "active" || status === "delayed" || status === "completed" || status === "archived") {
-    return status;
-  }
-
-  return "semua";
-}
-
-export async function ProjectsPage({
+export function ProjectsPage({
   searchParams,
+  projects,
+  counts,
 }: {
   searchParams: ProjectListSearchParams;
+  projects: ProjectListItem[];
+  counts: ProjectCounts;
 }) {
-  const query = await searchParams;
-  const selectedStatus = normalizeStatus(query.status);
-  const searchQuery = query.q?.trim().toLowerCase() ?? "";
-  const sort = query.sort ?? "latest";
-  const counts = getProjectCounts();
-
-  let projects = getProjects().filter((project) =>
-    selectedStatus === "semua"
-      ? project.status !== "archived"
-      : project.status === selectedStatus
-  );
-
-  if (searchQuery) {
-    projects = projects.filter(
-      (project) =>
-        project.name.toLowerCase().includes(searchQuery) ||
-        project.owner.toLowerCase().includes(searchQuery)
-    );
-  }
-
-  projects = [...projects].sort((left, right) => {
-    if (sort === "deadline") return left.daysRemaining - right.daysRemaining;
-    if (sort === "progress-low") return left.progress - right.progress;
-    return right.startDate.localeCompare(left.startDate);
-  });
+  const selectedStatus = searchParams.status || "semua";
+  const sort = searchParams.sort || "latest";
 
   return (
     <div className="space-y-6">
@@ -91,7 +64,7 @@ export async function ProjectsPage({
             <Search className="pointer-events-none absolute left-4 top-3.5 size-4 text-zinc-400" />
             <input
               name="q"
-              defaultValue={query.q}
+              defaultValue={searchParams.q}
               placeholder="Cari nama proyek atau owner..."
               className="min-h-11 w-full rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 pl-11 text-sm text-zinc-900"
             />
